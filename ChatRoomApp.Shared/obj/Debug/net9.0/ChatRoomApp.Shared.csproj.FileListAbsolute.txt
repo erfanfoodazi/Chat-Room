@@ -1,0 +1,11 @@
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\bin\Debug\net9.0\ChatRoomApp.Shared.deps.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\bin\Debug\net9.0\ChatRoomApp.Shared.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\bin\Debug\net9.0\ChatRoomApp.Shared.pdb
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.AssemblyInfoInputs.cache
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.AssemblyInfo.cs
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.csproj.CoreCompileInputs.cache
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\refint\ChatRoomApp.Shared.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ChatRoomApp.Shared.pdb
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp.Shared\obj\Debug\net9.0\ref\ChatRoomApp.Shared.dll

@@ -1,0 +1,5 @@
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json

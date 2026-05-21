@@ -1,0 +1,4 @@
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\wwwroot\appsettings.Development.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\wwwroot\appsettings.json
+wwwroot\appsettings.Development.json
+wwwroot\appsettings.json

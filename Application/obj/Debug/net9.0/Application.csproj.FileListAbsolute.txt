@@ -1,0 +1,11 @@
+D:\code\NewJob\Cs\ChatRoom\Application\bin\Debug\net9.0\Application.deps.json
+D:\code\NewJob\Cs\ChatRoom\Application\bin\Debug\net9.0\Application.dll
+D:\code\NewJob\Cs\ChatRoom\Application\bin\Debug\net9.0\Application.pdb
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.AssemblyInfoInputs.cache
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.AssemblyInfo.cs
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.csproj.CoreCompileInputs.cache
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.dll
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\refint\Application.dll
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\Application.pdb
+D:\code\NewJob\Cs\ChatRoom\Application\obj\Debug\net9.0\ref\Application.dll
