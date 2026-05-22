@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "G/pwnCgTYUQ=",
-  "success": false,
+  "dgSpecHash": "tbDk74oG4eE=",
+  "success": true,
   "projectFilePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.0\\microsoft.aspnetcore.authorization.9.0.0.nupkg.sha512",
@@ -43,18 +43,5 @@
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.15\\microsoft.netcore.app.ref.9.0.15.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\9.0.15\\microsoft.netcore.app.runtime.mono.browser-wasm.9.0.15.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj'. Check that the project reference is valid and that the project file exists.",
-      "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
-      "filePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
-      "libraryId": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
-      "targetGraphs": [
-        "net9.0",
-        "net9.0/browser-wasm"
-      ]
-    }
-  ]
+  "logs": []
 }

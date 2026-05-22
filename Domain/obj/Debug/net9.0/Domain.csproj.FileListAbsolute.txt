@@ -1,6 +1,7 @@
 D:\code\NewJob\Cs\ChatRoom\Domain\bin\Debug\net9.0\Domain.deps.json
 D:\code\NewJob\Cs\ChatRoom\Domain\bin\Debug\net9.0\Domain.dll
 D:\code\NewJob\Cs\ChatRoom\Domain\bin\Debug\net9.0\Domain.pdb
+D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.csproj.AssemblyReference.cache
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.AssemblyInfoInputs.cache
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.AssemblyInfo.cs
@@ -9,4 +10,3 @@ D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.dll
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\refint\Domain.dll
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.pdb
 D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\ref\Domain.dll
-D:\code\NewJob\Cs\ChatRoom\Domain\obj\Debug\net9.0\Domain.csproj.AssemblyReference.cache

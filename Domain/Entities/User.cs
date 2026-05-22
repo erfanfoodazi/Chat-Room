@@ -10,11 +10,11 @@ public class User : IdentityUser<int>
     public bool IsOnline { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public virtual ICollection<PersonalChat> PersonalChats { get; set; } = new List<PersonalChat>();
     public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();
     public virtual ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
+
+    public virtual ICollection<PersonalChat> PersonalChats { get; set; } = new List<PersonalChat>();
     public virtual ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
-    public virtual ICollection<GroupMessage> GroupMessages { get; set; } = new List<GroupMessage>();
 
     public void UpdateLastSeen()
     {

@@ -15,7 +15,7 @@ public class GroupChat
 
     public virtual ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
 
-    public virtual ICollection<GroupMessage> Messages { get; set; } = new List<GroupMessage>();
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 }
 
 

@@ -598,6 +598,16 @@
         "build": {
           "buildTransitive/net8.0/_._": {}
         }
+      },
+      "ChatRoomApp.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ChatRoomApp.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ChatRoomApp.Shared.dll": {}
+        }
       }
     },
     "net9.0/browser-wasm": {
@@ -1196,6 +1206,16 @@
         },
         "build": {
           "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "ChatRoomApp.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ChatRoomApp.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ChatRoomApp.Shared.dll": {}
         }
       }
     }
@@ -2294,11 +2314,16 @@
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "ChatRoomApp.Shared/1.0.0": {
+      "type": "project",
+      "path": "../../ChatRoomApp.Shared/ChatRoomApp.Shared.csproj",
+      "msbuildProject": "../../ChatRoomApp.Shared/ChatRoomApp.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
+      "ChatRoomApp.Shared >= 1.0.0",
       "Microsoft.AspNetCore.Components.WebAssembly >= 9.0.0",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 9.0.0",
       "Microsoft.AspNetCore.SignalR.Client >= 9.0.0",
@@ -2339,8 +2364,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
-              "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
+            "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+              "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
             }
           }
         }
@@ -2421,17 +2446,5 @@
         "#import": []
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj'. Check that the project reference is valid and that the project file exists.",
-      "libraryId": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
-      "targetGraphs": [
-        "net9.0",
-        "net9.0/browser-wasm"
-      ]
-    }
-  ]
+  }
 }
