@@ -10,9 +10,12 @@ namespace Application.Interfaces
     public interface IPersonalChatRepository
     {
         Task<PersonalChat> CreatePersonalChat (PersonalChat personalChat);
-        Task<string> SendMessage (int sender , int reciver ,Message message);
+        Task<PersonalChat> GetPersonalChatById (int personalChatId);
+        Task<string> SendMessage (Message message);
         Task<bool> DeletePesonalChat(int personalChatId);
         Task<bool> MakeBlockChat (int personalChatId,int blockerUserId);
         Task<bool> MakeArchiveChat (int personalChatId);
+        Task<List<PersonalChat>> GetPersonalChatsByUserId (int userId);
+        
     }
 }

@@ -320,3 +320,8 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\refint\ChatR
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.pdb
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.genruntimeconfig.cache
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ref\ChatRoomApp.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Newtonsoft.Json.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\SendGrid.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\StarkbankEcdsa.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.sourcelink.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
