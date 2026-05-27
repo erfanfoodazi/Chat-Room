@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface IUser
+    public interface IUserRepository
     {
-        Task<User>
+        Task<User> AddUserAsync(User user);
+        Task<bool> DeleteUserAsync(int userId);
+        Task<User> GetUserByEmailAsync(string email);
+        Task<User> GetUserByIdAsync(int userId);
+        Task<User> GetUserByPhoneNumberAsync(string phoneNumber);
+        Task<User> GetUserByUsernameAsync(string username);
+        Task<bool> UpdateUserAsync(User user);
+       
     }
 }

@@ -455,6 +455,9 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
+              "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
+                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj"
+              },
               "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
                 "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
               }
@@ -500,6 +503,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.0, )"
+            },
+            "SendGrid": {
+              "target": "Package",
+              "version": "[9.29.3, )"
             }
           },
           "imports": [

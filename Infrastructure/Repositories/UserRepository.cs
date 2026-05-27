@@ -8,6 +8,7 @@ using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SendGrid.Helpers.Errors.Model;
 
 namespace Infrastructure.Repositories
 {
@@ -35,7 +36,7 @@ namespace Infrastructure.Repositories
 
             if (user == null)
             {
-                _logger.LogError($"Can't find any user with this id {userId}");
+                _logger.LogError("Can't find any user with this id {userId}",userId);
                 return false;
             }
 
@@ -51,7 +52,7 @@ namespace Infrastructure.Repositories
             if (user == null)
             {
                 _logger.LogError("User not found");
-                return null;
+                throw new NotFoundException($"User with email {email} not found");
             }
             return user;
         }
@@ -63,7 +64,7 @@ namespace Infrastructure.Repositories
             if (user == null)
             {
                 _logger.LogError("User not found");
-                return null;
+                throw new NotFoundException($"User with ID {userId} not found");
             }
             return user;
         }
@@ -75,7 +76,7 @@ namespace Infrastructure.Repositories
             if (user == null)
             {
                 _logger.LogError("User not found");
-                return null;
+                throw new NotFoundException($"User with phone number {phoneNumber} not found");
             }
             return user;
         }
@@ -87,7 +88,7 @@ namespace Infrastructure.Repositories
             if (user == null)
             {
                 _logger.LogError("user not found");
-                return null;
+                throw new NotFoundException($"User with username {username} not found");
             }
             return user;
         }
@@ -107,8 +108,6 @@ namespace Infrastructure.Repositories
             existingUser.Email = user.Email;
             existingUser.PhoneNumber = user.PhoneNumber;
             existingUser.ProfilePictureUrl = user.ProfilePictureUrl;
-            existingUser.Bio = user.Bio; // اگر داری
-            existingUser.UpdatedAt = DateTime.UtcNow; // اگر این فیلد را اضافه کرده باشی
 
             await _context.SaveChangesAsync();
             return true;
