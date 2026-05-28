@@ -8,6 +8,7 @@ public class User : IdentityUser<int>
     public string? ProfilePictureUrl { get; set; }
     public DateTime LastSeen { get; set; }
     public bool IsOnline { get; set; }
+    public string Bio { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();

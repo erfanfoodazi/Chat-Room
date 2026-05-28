@@ -16,6 +16,45 @@ public class GroupChat
     public virtual ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
 
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
+    public GroupMember CreateMember(User user,int groupId)
+    {
+        var member = new GroupMember()
+        {
+            GroupChatId = groupId,
+            JoinedAt = DateTime.Now,
+            Role = GroupRole.Member,
+            UserId = user.Id,
+            
+        };
+        return member;
+
+    }
+    public GroupMember CreateOwnerUser(User user)
+    {
+        var member = new GroupMember()
+        {
+            GroupChatId = this.Id,
+            JoinedAt = DateTime.Now,
+            Role = GroupRole.Owner,
+            UserId = user.Id,
+
+        };
+        return member;
+
+    }
+    public GroupMember CreateAdminUser(User user)
+    {
+        var member = new GroupMember()
+        {
+            GroupChatId = this.Id,
+            Role = GroupRole.Admin,
+            UserId = user.Id,
+
+        };
+        return member;
+
+    }
 }
 
 

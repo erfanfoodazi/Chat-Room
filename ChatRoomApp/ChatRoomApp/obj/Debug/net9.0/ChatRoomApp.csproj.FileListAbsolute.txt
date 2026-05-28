@@ -324,4 +324,9 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Newtonsoft.J
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\SendGrid.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\StarkbankEcdsa.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.sourcelink.json
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\MediatR.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\MediatR.Contracts.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\System.Diagnostics.DiagnosticSource.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

@@ -1,14 +1,25 @@
+﻿using Application.Interfaces;
+using ChatRoomApp.Components;
+using ChatRoomApp.Hubs;
+using Domain.Entities;
+using Infrastructure.DataBaseContext;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.DataBaseContext;
-using Domain.Entities;
-using ChatRoomApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepsitory>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
+builder.Services.AddScoped<IPersonalChatRepository, PersonalChatRepository>();
+
+// Identity
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -16,17 +27,16 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
-
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
-
     options.User.RequireUniqueEmail = true;
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+// Auth
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
@@ -42,15 +52,19 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser());
 });
 
+// SignalR
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-    options.MaximumReceiveMessageSize = 102400; // 100KB
+    options.MaximumReceiveMessageSize = 102400;
 });
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+// ✅ Correct Blazor Web App (.NET 9) setup
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
@@ -73,16 +87,17 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseCors("AllowBlazorClient");
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery(); 
 
-app.MapBlazorHub();
 app.MapHub<ChatHub>("/chathub");
-app.MapFallbackToPage("/_Host");
-app.MapControllers(); 
 
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(ChatRoomApp.Client._Imports).Assembly);
 
 using (var scope = app.Services.CreateScope())
 {
@@ -90,20 +105,18 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        await context.Database.MigrateAsync(); 
+        await context.Database.MigrateAsync();
 
-        
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
         if (!await roleManager.RoleExistsAsync("Admin"))
             await roleManager.CreateAsync(new IdentityRole<int>("Admin"));
-
         if (!await roleManager.RoleExistsAsync("User"))
             await roleManager.CreateAsync(new IdentityRole<int>("User"));
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "failed id create Data base");
+        logger.LogError(ex, "failed to create Database");
     }
 }
 
