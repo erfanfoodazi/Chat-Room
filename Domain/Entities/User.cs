@@ -28,4 +28,9 @@ public class User : IdentityUser<int>
         IsOnline = true;
         LastSeen = DateTime.UtcNow;
     }
+    public void SetOffline()
+    {
+        IsOnline = false;
+        LastSeen = DateTime.UtcNow;
+    }
 }

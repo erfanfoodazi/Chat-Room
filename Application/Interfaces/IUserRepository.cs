@@ -9,13 +9,14 @@ namespace Application.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> AddUserAsync(User user);
+        Task<User> AddUserAsync(User user, string password);
         Task<bool> DeleteUserAsync(int userId);
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByIdAsync(int userId);
         Task<User> GetUserByPhoneNumberAsync(string phoneNumber);
         Task<User> GetUserByUsernameAsync(string username);
         Task<bool> UpdateUserAsync(User user);
+        Task<bool> MakeUserOnlineOrOffline(int userId);
        
     }
 }

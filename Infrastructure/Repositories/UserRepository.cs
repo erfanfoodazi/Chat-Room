@@ -1,105 +1,118 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.DataBaseContext;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SendGrid.Helpers.Errors.Model;
 
 namespace Infrastructure.Repositories
 {
     public class UserRepsitory : IUserRepository
     {
-        private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<UserRepsitory> _logger;
-        public UserRepsitory(AppDbContext context,ILogger<UserRepsitory> logger)
+
+        public UserRepsitory(UserManager<User> userManager, ILogger<UserRepsitory> logger)
         {
-            _context = context;
+            _userManager = userManager;
             _logger = logger;
         }
-        public async Task<User> AddUserAsync(User user)
+
+        public async Task<User> AddUserAsync(User user, string password)
         {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogError("Failed to create user: {Errors}", errors);
+                throw new Exception($"Failed to create user: {errors}");
+            }
             return user;
         }
 
         public async Task<bool> DeleteUserAsync(int userId)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                _logger.LogError("Can't find any user with this id {userId}",userId);
+                _logger.LogWarning("User {UserId} not found for deletion", userId);
                 return false;
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
+            var result = await _userManager.DeleteAsync(user);
+            return result.Succeeded;
         }
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                _logger.LogError("User not found");
-                throw new NotFoundException($"User with email {email} not found");
+                _logger.LogWarning("User with email {Email} not found", email);
+                return null;
             }
             return user;
         }
 
         public async Task<User> GetUserByIdAsync(int userId)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                _logger.LogError("User not found");
-                throw new NotFoundException($"User with ID {userId} not found");
+                _logger.LogWarning("User with ID {UserId} not found", userId);
+                return null;
             }
             return user;
         }
 
         public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
         {
-            var user = await _context.Users
+            var user = await _userManager.Users
                 .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
             if (user == null)
             {
-                _logger.LogError("User not found");
-                throw new NotFoundException($"User with phone number {phoneNumber} not found");
+                _logger.LogWarning("User with phone {PhoneNumber} not found", phoneNumber);
+                return null;
             }
             return user;
         }
 
         public async Task<User> GetUserByUsernameAsync(string username)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == username);
+            var user = await _userManager.FindByNameAsync(username);
             if (user == null)
             {
-                _logger.LogError("user not found");
-                throw new NotFoundException($"User with username {username} not found");
+                _logger.LogWarning("User with username {Username} not found", username);
+                return null;
             }
             return user;
         }
 
+        public async Task<bool> MakeUserOnlineOrOffline(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                _logger.LogWarning("User with ID {UserId} not found", userId);
+                return false;
+            }
+            if (user.IsOnline)
+            {
+                user.SetOffline();
+            }
+            else 
+            {
+                user.SetOnline();
+            }
+
+            await _userManager.UpdateAsync(user);
+            return user.IsOnline;
+        }
+
         public async Task<bool> UpdateUserAsync(User user)
         {
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == user.Id);
+            var existingUser = await _userManager.FindByIdAsync(user.Id.ToString());
             if (existingUser == null)
             {
-                _logger.LogError("User not found");
+                _logger.LogError("User {UserId} not found for update", user.Id);
                 return false;
             }
 
@@ -109,8 +122,8 @@ namespace Infrastructure.Repositories
             existingUser.PhoneNumber = user.PhoneNumber;
             existingUser.ProfilePictureUrl = user.ProfilePictureUrl;
 
-            await _context.SaveChangesAsync();
-            return true;
+            var result = await _userManager.UpdateAsync(existingUser);
+            return result.Succeeded;
         }
     }
 }
