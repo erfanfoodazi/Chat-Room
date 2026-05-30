@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Users\UseCases\Queries\" />
+    <Folder Include="PersonalChats\UseCases\Queries\" />
   </ItemGroup>
 
 </Project>

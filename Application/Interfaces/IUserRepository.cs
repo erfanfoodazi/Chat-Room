@@ -17,6 +17,6 @@ namespace Application.Interfaces
         Task<User> GetUserByUsernameAsync(string username);
         Task<bool> UpdateUserAsync(User user);
         Task<bool> MakeUserOnlineOrOffline(int userId);
-       
+        Task<bool> ChangeUserPassword(int userId, string currentPassword, string newPassword);
     }
 }

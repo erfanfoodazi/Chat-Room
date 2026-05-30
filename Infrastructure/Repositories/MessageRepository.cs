@@ -22,14 +22,14 @@ namespace Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task<Message> CreateMessage(Message message)
+        public async Task<Message> CreateMessageAsync(Message message)
         {
             await _context.Messages.AddAsync(message);
             await _context.SaveChangesAsync();    
             return message;
         }
 
-        public async Task<bool> DeleteMessage(int messageId)
+        public async Task<bool> DeleteMessageAsync(int messageId)
         {
             var message = await _context.Messages.FindAsync(messageId);
             if(message == null)
@@ -42,7 +42,7 @@ namespace Infrastructure.Repositories
             return true;
         }
 
-        public async Task<Message> EditMessage(Message message)
+        public async Task<Message> EditMessageAsync(Message message)
         {
             var existMessage = await _context.Messages.FindAsync(message.Id);
             if (existMessage == null)
@@ -55,7 +55,7 @@ namespace Infrastructure.Repositories
             return existMessage;
         }
 
-        public async Task<Message> GetMessageById(int messageId)
+        public async Task<Message> GetMessageByIdAsync(int messageId)
         {
             var message = await _context.Messages.FindAsync(messageId);
             if(message == null)
@@ -66,7 +66,7 @@ namespace Infrastructure.Repositories
             return message;
         }
 
-        public async Task<List<Message>> GetMessagesByGroupChatId(int groupChatId, int skip = 0, int take = 50)
+        public async Task<List<Message>> GetMessagesByGroupChatIdAsync(int groupChatId, int skip = 0, int take = 50)
         {
             var messages = await _context.Messages
                 .Where(m => m.GroupChatId == groupChatId)
@@ -77,7 +77,7 @@ namespace Infrastructure.Repositories
             return messages;
         }
 
-        public async Task<List<Message>> GetMessagesByPersonalChatId(int personalChatId,int skip = 0, int take = 50)
+        public async Task<List<Message>> GetMessagesByPersonalChatIdAsync(int personalChatId,int skip = 0, int take = 50)
         {
             var messages = await _context.Messages
                 .Where(m => m.PersonalChatId == personalChatId)
@@ -88,7 +88,7 @@ namespace Infrastructure.Repositories
             return messages;
         }
 
-        public async Task<bool> MakeMessageDelivered(int messageId)
+        public async Task<bool> MakeMessageDeliveredAsync(int messageId)
         {
             var message = await _context.Messages
                 .FindAsync(messageId);
@@ -102,7 +102,7 @@ namespace Infrastructure.Repositories
             return true;
         }
 
-        public async Task<bool> MakeMessageSeen(int messageId)
+        public async Task<bool> MakeMessageSeenAsync(int messageId)
         {
             var message = await _context.Messages
                .FindAsync(messageId);

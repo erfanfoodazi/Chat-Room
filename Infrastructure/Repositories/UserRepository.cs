@@ -29,6 +29,18 @@ namespace Infrastructure.Repositories
             return user;
         }
 
+        public async Task<bool> ChangeUserPassword(int userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                _logger.LogWarning("User {UserId} not found for password change", userId);
+                return false;
+            }
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            return result.Succeeded;
+        }
+
         public async Task<bool> DeleteUserAsync(int userId)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -102,7 +114,7 @@ namespace Infrastructure.Repositories
             {
                 user.SetOnline();
             }
-
+            
             await _userManager.UpdateAsync(user);
             return user.IsOnline;
         }
