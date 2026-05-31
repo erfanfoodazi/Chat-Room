@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace Application.Messages.UseCases.Queries
 {
-    public class GetMesaagesByPesonalChatIdQuery : IRequest<List<MessageDto>>
+    public class GetMessagesByPersonalChatIdQuery : IRequest<List<MessageDto>>
     {
         public int PersonalId { get; set; }
     }
 
-    public class GetMesaagesByPesonalChatIdQueryHandler : IRequestHandler<GetMesaagesByPesonalChatIdQuery, List<MessageDto>>
+    public class GetMessagesByPesonalChatIdQueryHandler : IRequestHandler<GetMessagesByPersonalChatIdQuery, List<MessageDto>>
     {
         private readonly IMessageRepository _messageRepository;
-        public GetMesaagesByPesonalChatIdQueryHandler(IMessageRepository messageRepository)
+        public GetMessagesByPesonalChatIdQueryHandler(IMessageRepository messageRepository)
         {
             _messageRepository = messageRepository;
         }
-        public async Task<List<MessageDto>> Handle(GetMesaagesByPesonalChatIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<MessageDto>> Handle(GetMessagesByPersonalChatIdQuery request, CancellationToken cancellationToken)
         {
             var messages = await _messageRepository.GetMessagesByPersonalChatIdAsync(request.PersonalId);
             if (messages == null || !messages.Any())

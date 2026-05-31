@@ -14,7 +14,7 @@ namespace Application.PersonalChats.UseCases
 
         public int UserOneId { get; set; }
         public int UserTwoId { get; set; }
-        public ICollection<MessageDto> Messages { get; set; } = new List<MessageDto>();
+        public List<MessageDto> Messages { get; set; } = new List<MessageDto>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastMessageTime { get; set; }
         public string? LastMessageText { get; set; }

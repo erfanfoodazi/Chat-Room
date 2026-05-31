@@ -41,6 +41,16 @@ namespace Infrastructure.Repositories
             return true;
         }
 
+        public async Task<int> ExistChat(int userOneId, int userTwoId)
+        {
+            var chat = await _context.PersonalChats
+                .FirstOrDefaultAsync(p =>
+                p.UserOneId == userOneId && p.UserTwoId == userTwoId ||
+                p.UserOneId == userTwoId && p.UserTwoId == userOneId);
+
+            return chat?.Id ?? 0;
+        }
+
         public async Task<PersonalChat> GetPersonalChatById(int personalChatId)
         {
             var result = await _context.PersonalChats

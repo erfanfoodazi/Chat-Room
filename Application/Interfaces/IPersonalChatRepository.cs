@@ -16,6 +16,7 @@ namespace Application.Interfaces
         Task<bool> MakeBlockChat (int personalChatId,int blockerUserId);
         Task<bool> MakeArchiveChat (int personalChatId);
         Task<List<PersonalChat>> GetPersonalChatsByUserId (int userId);
+        Task<int> ExistChat (int userOneId, int userTwoId);
         
     }
 }
