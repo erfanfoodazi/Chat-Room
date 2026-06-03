@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories
 {
-    public class UserRepsitory : IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly UserManager<User> _userManager;
-        private readonly ILogger<UserRepsitory> _logger;
+        private readonly ILogger<UserRepository> _logger;
 
-        public UserRepsitory(UserManager<User> userManager, ILogger<UserRepsitory> logger)
+        public UserRepository(UserManager<User> userManager, ILogger<UserRepository> logger)
         {
             _userManager = userManager;
             _logger = logger;
