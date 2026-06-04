@@ -32,8 +32,8 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/code/NewJob/Cs/ChatRoom/ChatRoomApp/ChatRoomApp/Components/Pages/Account/Login.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBY2NvdW50XExvZ2luLnJhem9y
+[D:/code/NewJob/Cs/ChatRoom/ChatRoomApp/ChatRoomApp/Components/Layout/NoLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTm9MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/code/NewJob/Cs/ChatRoom/ChatRoomApp/ChatRoomApp/Components/Pages/Account/Register.razor]
@@ -67,3 +67,7 @@ build_metadata.AdditionalFiles.CssScope = b-ihlqhshkn1
 [D:/code/NewJob/Cs/ChatRoom/ChatRoomApp/ChatRoomApp/Components/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-jjr3nluwie
+
+[D:/code/NewJob/Cs/ChatRoom/ChatRoomApp/ChatRoomApp/Pages/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

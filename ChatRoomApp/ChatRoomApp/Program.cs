@@ -15,13 +15,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Application.AssemblyMarker).Assembly));
-// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
 builder.Services.AddScoped<IPersonalChatRepository, PersonalChatRepository>();
 
-// Identity
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -38,15 +36,13 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Auth
-builder.Services.AddAuthentication()
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "ChatRoomAuth";
-        options.LoginPath = "/account/login";
-        options.LogoutPath = "/account/logout";
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-    });
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "ChatRoomAuth";
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -54,19 +50,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser());
 });
 
-// SignalR
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = builder.Environment.IsDevelopment();
     options.MaximumReceiveMessageSize = 102400;
 });
 
-// ✅ Correct Blazor Web App (.NET 9) setup
+builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
@@ -94,10 +88,16 @@ app.UseRouting();
 app.UseCors("AllowBlazorClient");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseAntiforgery(); 
+app.UseAntiforgery();
+
 
 app.MapHub<ChatHub>("/chathub");
-
+app.MapRazorPages();
+app.MapPost("/account/logout", async (SignInManager<User> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Redirect("/account/login");
+});
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()

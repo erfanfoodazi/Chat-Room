@@ -308,8 +308,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\k
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\3g5n5tl8ka-h1s4sie4z3.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\i9910odjqi-63fj8s7r0e.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\lwcic7cfck-0j3bgjxly4.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\fnomgqlyk1-yhiwv3pefc.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\ei9ws3k8v6-yhiwv3pefc.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.build.json
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.development.json
@@ -329,4 +327,8 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\MediatR.Cont
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\System.Diagnostics.DiagnosticSource.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\fnomgqlyk1-e5hzqw8f2i.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\ei9ws3k8v6-e5hzqw8f2i.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.RazorAssemblyInfo.cache
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.RazorAssemblyInfo.cs
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
