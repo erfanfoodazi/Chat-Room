@@ -1,8 +1,11 @@
 ﻿@page "/chat"
 @using ChatRoomApp.ViewModels.Chat
 @using MediatR
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IMediator Mediator
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>My Chats</h3>
 
@@ -62,11 +65,24 @@ else
 @code {
     List<ChatListViewModel> chats = new List<ChatListViewModel>();
     bool isLoading = true;
-    private int currentUserId = 1; // Replace with actual user ID from authentication
+    private int currentUserId = 0;
 
     protected override async Task OnInitializedAsync()
     {
+        await GetCurrentUserId();
         await LoadChats();
+    }
+
+    private async Task GetCurrentUserId()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+        
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            currentUserId = userId;
+        }
     }
 
     private async Task LoadChats()
