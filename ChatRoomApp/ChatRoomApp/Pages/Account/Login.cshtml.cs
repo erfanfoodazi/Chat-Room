@@ -44,7 +44,7 @@ namespace ChatRoomApp.Pages.Account
                 lockoutOnFailure: true);
 
             if (result.Succeeded)
-                return Redirect("/");
+                return Redirect("/chat");
 
             if (result.IsLockedOut)
                 ErrorMessage = "Account is locked. Try again later.";

@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using ChatRoomApp.Components;
 using ChatRoomApp.Hubs;
+using ChatRoomApp.Services;
 using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Infrastructure.Repositories;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
 builder.Services.AddScoped<IPersonalChatRepository, PersonalChatRepository>();
+builder.Services.AddScoped<IChatListService, ChatListService>();
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
@@ -56,6 +58,7 @@ builder.Services.AddSignalR(options =>
     options.MaximumReceiveMessageSize = 102400;
 });
 
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -89,6 +92,7 @@ app.UseCors("AllowBlazorClient");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+
 
 
 app.MapHub<ChatHub>("/chathub");
