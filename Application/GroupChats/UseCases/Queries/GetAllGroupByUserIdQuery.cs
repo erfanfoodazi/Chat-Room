@@ -38,6 +38,14 @@ namespace Application.GroupChats.UseCases.Queries
                     GroupId = group.Id
                 }, cancellationToken);
 
+                string lastText = "";
+                DateTime lastTime = DateTime.MinValue;
+                foreach (var item in messages)
+                {
+                    lastText = item.Text;
+                    lastTime = item.SentTime;
+                }
+
                 var members = group.Members.Select(m => new GroupMemberDto
                 {
                     GroupChatId = m.GroupChatId,
@@ -58,6 +66,9 @@ namespace Application.GroupChats.UseCases.Queries
                     ProfilePictureUrl = group.ProfilePictureUrl,
                     Members = members,
                     Messages = messages,
+                    LastMessageText = lastText,
+                    LastMessageTime = lastTime
+                    
                 });
             }
             return result;

@@ -1,10 +1,8 @@
 using Application.Users.UseCases.Commands;
 using Application.Users.UseCases.Queries;
 using ChatRoomApp.Models.Auth;
-using ChatRoomApp.Services;
 using Domain.Entities;
 using MediatR;
-using ChatRoomApp.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +18,7 @@ public static class AuthEndpoints
         group.MapPost("/login", LoginAsync).AllowAnonymous();
         group.MapPost("/register", RegisterAsync).AllowAnonymous();
         group.MapGet("/me", GetCurrentUserAsync)
-            .RequireAuthorization(new AuthorizeAttribute
-            {
-                AuthenticationSchemes = JwtAuthenticationDefaults.AuthenticationScheme
-            });
+            .RequireAuthorization();
 
         return group;
     }
@@ -32,8 +27,7 @@ public static class AuthEndpoints
         LoginRequest request,
         UserManager<User> userManager,
         SignInManager<User> signInManager,
-        IMediator mediator,
-        ITokenService tokenService)
+        IMediator mediator)
     {
         var userDto = await mediator.Send(new GetUserByEmailQuery { Email = request.Email });
         if (userDto is null)
@@ -49,12 +43,11 @@ public static class AuthEndpoints
                 ? Results.Problem("Account is locked. Try again later.", statusCode: StatusCodes.Status423Locked)
                 : Results.Unauthorized();
 
-        var token = await tokenService.GenerateTokenAsync(user);
+        // Create cookie session
+        await signInManager.SignInAsync(user, isPersistent: true);
 
         return Results.Ok(new AuthResponse
         {
-            Token = token,
-            ExpiresAt = tokenService.GetExpiry(),
             UserId = user.Id,
             UserName = user.UserName ?? string.Empty,
             Email = user.Email ?? string.Empty,
@@ -65,8 +58,8 @@ public static class AuthEndpoints
     private static async Task<IResult> RegisterAsync(
         RegisterRequest request,
         UserManager<User> userManager,
-        IMediator mediator,
-        ITokenService tokenService)
+        SignInManager<User> signInManager,
+        IMediator mediator)
     {
         try
         {
@@ -83,13 +76,12 @@ public static class AuthEndpoints
                 return Results.Problem("User was created but could not be loaded.", statusCode: StatusCodes.Status500InternalServerError);
 
             await userManager.AddToRoleAsync(user, "User");
-
-            var token = await tokenService.GenerateTokenAsync(user);
+            
+            // Auto-login after registration
+            await signInManager.SignInAsync(user, isPersistent: true);
 
             return Results.Ok(new AuthResponse
             {
-                Token = token,
-                ExpiresAt = tokenService.GetExpiry(),
                 UserId = user.Id,
                 UserName = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,

@@ -1,5 +1,6 @@
 ﻿using Application.Messages.UseCases.Dto;
 using Domain.Entities;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Application.GroupChats.UseCases.DTOs
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? ProfilePictureUrl { get; set; }
+        public string? LastMessageText { get; set; } 
+        public DateTime? LastMessageTime { get; set; }
 
         public int OwnerId { get; set; }
         public DateTime CreatedAt { get; set; } 

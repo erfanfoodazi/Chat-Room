@@ -1,7 +1,5 @@
 ﻿using Application.Interfaces;
-using ChatRoomApp.Authentication;
 using ChatRoomApp.Components;
-using ChatRoomApp.Configuration;
 using ChatRoomApp.Endpoints;
 using ChatRoomApp.Hubs;
 using ChatRoomApp.Services;
@@ -10,7 +8,6 @@ using Infrastructure.DataBaseContext;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ChatRoomApp.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,15 +22,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
 builder.Services.AddScoped<IPersonalChatRepository, PersonalChatRepository>();
 builder.Services.AddScoped<IChatListService, ChatListService>();
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, NameUserIdProvider>();
-
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
-    ?? throw new InvalidOperationException("JWT settings are not configured.");
-
-// Validate JWT settings
-JwtKeyValidator.ValidateJwtSettings(jwtSettings, builder.Environment);
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
@@ -59,19 +48,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
 });
 
-builder.Services.AddAuthentication()
-    .AddScheme<JwtAuthenticationOptions, JwtAuthenticationHandler>(
-        JwtAuthenticationDefaults.AuthenticationScheme,
-        _ => { });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAuthenticatedUser", policy =>
-        policy.AddAuthenticationSchemes(
-                IdentityConstants.ApplicationScheme,
-                JwtAuthenticationDefaults.AuthenticationScheme)
-            .RequireAuthenticatedUser());
-});
+builder.Services.AddAuthorization();
 
 builder.Services.AddSignalR(options =>
 {

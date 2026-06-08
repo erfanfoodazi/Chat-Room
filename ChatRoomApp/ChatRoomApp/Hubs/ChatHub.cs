@@ -3,13 +3,12 @@ using Application.Messages.UseCases.Commands;
 using Application.PersonalChats.UseCases.Commands;
 using Application.Users.UseCases.Commands;
 using MediatR;
-using ChatRoomApp.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatRoomApp.Hubs;
 
-[Authorize(AuthenticationSchemes = JwtAuthenticationDefaults.CombinedScheme)]
+[Authorize]
 public class ChatHub : Hub
 {
     private readonly IMediator _mediator;

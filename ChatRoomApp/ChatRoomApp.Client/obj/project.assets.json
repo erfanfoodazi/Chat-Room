@@ -2338,11 +2338,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+      "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
       "projectName": "ChatRoomApp.Client",
-      "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+      "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
       "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-      "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
+      "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2364,8 +2364,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
-              "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
+            "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+              "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
             }
           }
         }
@@ -2446,5 +2446,13 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
+    }
+  ]
 }

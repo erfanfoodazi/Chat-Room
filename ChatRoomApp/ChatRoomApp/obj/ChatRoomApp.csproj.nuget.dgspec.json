@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj": {}
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj": {}
   },
   "projects": {
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
               }
             }
           }
@@ -80,14 +80,14 @@
         }
       }
     },
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
         "projectName": "ChatRoomApp.Shared",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -146,14 +146,14 @@
         }
       }
     },
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
         "projectName": "ChatRoomApp.Client",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -175,8 +175,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
               }
             }
           }
@@ -258,14 +258,14 @@
         }
       }
     },
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
         "projectName": "ChatRoomApp",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -287,17 +287,17 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj"
               },
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj"
               },
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
               },
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -364,14 +364,14 @@
         }
       }
     },
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -440,14 +440,14 @@
         }
       }
     },
-    "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj": {
+    "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj",
+        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\obj\\",
+        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -469,11 +469,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Application\\Application.csproj"
               },
-              "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
-                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
+              "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj": {
+                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\Domain\\Domain.csproj"
               }
             }
           }
