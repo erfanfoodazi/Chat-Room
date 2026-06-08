@@ -1,10 +1,11 @@
 ﻿@page "/account/register"
+@rendermode InteractiveServer
 @layout NoLayout
 @using MediatR
 @using Application.Users.UseCases.Commands
 @inject IMediator Mediator
 @inject NavigationManager Navigation
-@rendermode InteractiveServer
+
 
 <div class="min-vh-100 d-flex align-items-center justify-content-center bg-dark">
     <div class="card border-secondary shadow-lg" style="width: 100%; max-width: 460px;">

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {}
+    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {}
   },
   "projects": {
-    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
+        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
         "projectName": "ChatRoomApp.Shared",
-        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
+        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\obj\\",
+        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -70,14 +70,14 @@
         }
       }
     },
-    "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
+    "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+        "projectUniqueName": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
         "projectName": "ChatRoomApp.Client",
-        "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
+        "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
         "packagesPath": "C:\\Users\\Erfani\\.nuget\\packages\\",
-        "outputPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
+        "outputPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -99,8 +99,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
-                "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
+              "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj": {
+                "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp.Shared\\ChatRoomApp.Shared.csproj"
               }
             }
           }

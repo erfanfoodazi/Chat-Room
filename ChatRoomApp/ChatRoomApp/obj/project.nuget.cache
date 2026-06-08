@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HKObwLcM2v4=",
+  "dgSpecHash": "vFdu8Q4HmSQ=",
   "success": true,
-  "projectFilePath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
+  "projectFilePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Erfani\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
@@ -128,9 +128,9 @@
       "code": "NU1900",
       "level": "Warning",
       "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
+      "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
       "warningLevel": 1,
-      "filePath": "d:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
+      "filePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
       "targetGraphs": []
     }
   ]

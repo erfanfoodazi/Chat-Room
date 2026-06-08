@@ -1,4 +1,5 @@
-﻿@page "/chat"
+@page "/chat"
+@rendermode InteractiveServer
 @using ChatRoomApp.ViewModels.Chat
 @using MediatR
 @using System.Security.Claims
@@ -8,7 +9,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>My Chats</h3>
-
 @if (isLoading)
 {
     <div class="text-center">
@@ -62,7 +62,12 @@ else
     </div>
 }
 
+<button class="fab-new-chat" title="New Chat" @onclick="StartNewChat" type="button">
+    <i class="fas fa-plus"></i>
+</button>
+
 @code {
+
     List<ChatListViewModel> chats = new List<ChatListViewModel>();
     bool isLoading = true;
     private int currentUserId = 0;
@@ -78,7 +83,7 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
-        
+
         if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
         {
             currentUserId = userId;
@@ -115,6 +120,13 @@ else
         }
     }
 
+    private void StartNewChat()
+    {
+
+        Console.WriteLine("go to new chat page");
+        Navigation.NavigateTo("/chat/new");
+    }
+        
     private string FormatTime(DateTime time)
     {
         var now = DateTime.Now;
@@ -208,6 +220,37 @@ else
         color: #198754;
     }
 
+    /* Floating Action Button */
+    .fab-new-chat {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .fab-new-chat:hover {
+        background-color: #0b5ed7;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(13, 110, 253, 0.5);
+    }
+
+    .fab-new-chat:active {
+        transform: scale(0.95);
+    }
+
     /* Mobile responsive */
     @@media (max-width: 768px) {
         .chat-list {
@@ -218,6 +261,13 @@ else
         .chat-item {
             border-radius: 0;
             margin-bottom: 1px;
+        }
+
+        .fab-new-chat {
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
         }
     }
 </style>

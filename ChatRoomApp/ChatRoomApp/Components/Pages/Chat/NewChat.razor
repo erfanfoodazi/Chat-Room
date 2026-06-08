@@ -1,0 +1,262 @@
+@page "/chat/new"
+@rendermode InteractiveServer
+@using MediatR
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Application.Users.UseCases.Queries
+@using Application.Users.UseCases.DTOs
+@using Application.PersonalChats.UseCases.Commands
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="min-vh-100 d-flex flex-column bg-dark">
+    <!-- Header -->
+    <div class="new-chat-header d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary">
+        <button class="btn-back" @onclick="GoBack" type="button" title="Back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h4 class="m-0 text-white fw-semibold">New Chat</h4>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box px-4 py-3 border-bottom border-secondary">
+        <div class="input-group">
+            <span class="input-group-text bg-black border-secondary text-secondary">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text"
+                   class="form-control bg-black border-secondary text-white"
+                   placeholder="Search by username or email..."
+                   @bind="usernameOrEmail"
+                   @onkeydown="HandleKeyDown" />
+            <button class="btn btn-primary px-4"
+                    @onclick="FindChat"
+                    type="button"
+                    disabled="@(string.IsNullOrWhiteSpace(usernameOrEmail) || isSearching)">
+                @if (isSearching)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                }
+                else
+                {
+                    <span>Find</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="flex-grow-1 px-4 py-3">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger py-2">
+                <i class="fas fa-exclamation-circle me-2"></i>@errorMessage
+            </div>
+        }
+
+        @if (foundUser != null)
+        {
+            <div class="user-list">
+                <div class="user-card d-flex align-items-center gap-3 p-3" @onclick="StartChat" role="button">
+                    <div class="user-avatar">
+                        <div class="avatar-circle">
+                            <span>@(foundUser.FullName.Length > 0 ? foundUser.FullName[0].ToString().ToUpper() : "?")</span>
+                        </div>
+                    </div>
+                    <div class="user-details flex-grow-1">
+                        <h5 class="m-0 text-white fw-semibold">@foundUser.FullName</h5>
+                        <small class="text-secondary">@@@foundUser.UserName</small>
+                        @if (!string.IsNullOrEmpty(foundUser.Email))
+                        {
+                            <small class="text-secondary d-block">@foundUser.Email</small>
+                        }
+                    </div>
+                    <i class="fas fa-chevron-right text-secondary"></i>
+                </div>
+            </div>
+        }
+
+        @if (hasSearched && foundUser == null && string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-center mt-5">
+                <i class="fas fa-user-slash fa-2x text-secondary mb-3"></i>
+                <p class="text-secondary">No user found. Try a different username or email.</p>
+            </div>
+        }
+
+        @if (!hasSearched && string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-center mt-5">
+                <i class="fas fa-comments fa-2x text-secondary mb-3"></i>
+                <p class="text-secondary">Search for a user by username or email to start a new chat.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    string usernameOrEmail = string.Empty;
+    string errorMessage = string.Empty;
+    bool isSearching = false;
+    bool hasSearched = false;
+    Application.Users.UseCases.DTOs.UserDto? foundUser;
+    private int currentUserId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            currentUserId = userId;
+        }
+    }
+
+    private async Task FindChat()
+    {
+        if (string.IsNullOrWhiteSpace(usernameOrEmail))
+        {
+            errorMessage = "Please enter a username or email";
+            return;
+        }
+
+        isSearching = true;
+        errorMessage = string.Empty;
+        foundUser = null;
+        hasSearched = true;
+        StateHasChanged();
+
+        try
+        {
+            var trimmedInput = usernameOrEmail.Trim();
+
+            // Try email first, then username
+            var user = await Mediator.Send(new GetUserByEmailQuery { Email = trimmedInput });
+            if (user == null)
+            {
+                user = await Mediator.Send(new GetUserByUserNameQuery { UserName = trimmedInput });
+            }
+
+            if (user == null)
+            {
+                foundUser = null;
+                return;
+            }
+
+            // Can't chat with yourself
+            if (user.Id == currentUserId)
+            {
+                errorMessage = "You can't start a chat with yourself.";
+                foundUser = null;
+                return;
+            }
+
+            foundUser = user;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Search failed: {ex.Message}";
+        }
+        finally
+        {
+            isSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task StartChat()
+    {
+        if (foundUser == null) return;
+
+        try
+        {
+            var result = await Mediator.Send(new CreatePersonalChatCommand
+            {
+                UserOneId = currentUserId,
+                UserTwoId = foundUser.Id
+            });
+
+            if (result != null)
+            {
+                Navigation.NavigateTo($"/chat/personal/{result.Id}");
+            }
+            else
+            {
+                errorMessage = "Failed to create chat. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to start chat: {ex.Message}";
+        }
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/chat");
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await FindChat();
+        }
+    }
+}
+
+<style>
+    .btn-back {
+        background: none;
+        border: none;
+        color: #6c757d;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 8px 10px;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .user-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid #2d2d44;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .user-card:hover {
+        background: rgba(13, 110, 253, 0.15);
+        border-color: #0d6efd;
+        transform: translateX(4px);
+    }
+
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+</style>
