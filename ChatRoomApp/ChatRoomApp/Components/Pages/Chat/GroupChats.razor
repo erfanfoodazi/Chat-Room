@@ -1,4 +1,4 @@
-@page "/chat"
+﻿@page "/chat/group"
 @rendermode InteractiveServer
 @using ChatRoomApp.ViewModels.Chat
 @using MediatR
@@ -8,7 +8,7 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>My Chats</h3>
+<h3>Group Chats</h3>
 @if (isLoading)
 {
     <div class="text-center">
@@ -28,19 +28,12 @@ else
     <div class="chat-list">
         @foreach (var chat in chats)
         {
-            <div class="chat-item @(chat.ChatType == "Group" ? "group-chat" : "personal-chat")"
+            <div class="chat-item group-chat"
                  @onclick="() => OpenChat(chat)">
                 <div class="chat-info">
                     <div class="chat-header">
                         <h5 class="chat-name">
-                            @if (chat.ChatType == "Group")
-                            {
                                 <i class="fas fa-users"></i>
-                            }
-                            else
-                            {
-                                <i class="fas fa-user"></i>
-                            }
                             @chat.Name
                         </h5>
                         <small class="chat-time">@FormatTime(chat.LastMessageTime)</small>
@@ -95,8 +88,8 @@ else
         try
         {
             isLoading = true;
-            chats = await ChatListViewModel.GetAllChatsByUserIdAsync(currentUserId, Mediator);
-           
+            chats = await ChatListViewModel.GetGroupChatsByUserIdAsync(currentUserId, Mediator);
+
         }
         catch (Exception ex)
         {
@@ -111,14 +104,7 @@ else
 
     private void OpenChat(ChatListViewModel chat)
     {
-        if (chat.ChatType == "Personal")
-        {
-            Navigation.NavigateTo($"/chat/personal/{chat.Id}");
-        }
-        else
-        {
             Navigation.NavigateTo($"/chat/group/{chat.Id}");
-        }
     }
 
     private void StartNewChat()

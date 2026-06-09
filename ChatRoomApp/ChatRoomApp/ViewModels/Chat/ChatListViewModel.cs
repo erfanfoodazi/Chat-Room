@@ -77,6 +77,69 @@ namespace ChatRoomApp.ViewModels.Chat
             // Sort by last message time (most recent first)
             return result.OrderByDescending(x => x.LastMessageTime).ToList();
         }
+
+        public static async Task<List<ChatListViewModel>> GetPersonalChatsByUserIdAsync(
+            int userId,
+            IMediator mediator)
+        {
+            var result = new List<ChatListViewModel>();
+
+            var personalChats = await mediator.Send(
+                new GetPersonalChatsByUserIdQuery { UserId = userId });
+
+            foreach (var item in personalChats)
+            {
+                var chatViewModel = new ChatListViewModel
+                {
+                    Id = item.Id,
+                    UserId = userId,
+                    LastMessageText = item.LastMessageText ?? string.Empty,
+                    LastMessageTime = (DateTime)item.LastMessageTime,
+                    ChatType = "Personal"
+                };
+
+                var otherUserId = item.UserOneId == userId ? item.UserTwoId : item.UserOneId;
+                var userQuery = new GetUserByIdQuery { UserId = otherUserId };
+                var user = await mediator.Send(userQuery);
+
+                chatViewModel.Name = user?.UserName ?? "Unknown User";
+                chatViewModel.UserReceiverName = user?.UserName ?? string.Empty;
+                chatViewModel.Description = $"Chat with {chatViewModel.Name}";
+
+                result.Add(chatViewModel);
+            }
+
+            return result.OrderByDescending(x => x.LastMessageTime).ToList();
+        }
+
+        public static async Task<List<ChatListViewModel>> GetGroupChatsByUserIdAsync(
+            int userId,
+            IMediator mediator)
+        {
+            var result = new List<ChatListViewModel>();
+
+            var groupChats = await mediator.Send(
+                new GetAllGroupByUserIdQuery { UserId = userId });
+
+            foreach (var item in groupChats)
+            {
+                var chatViewModel = new ChatListViewModel
+                {
+                    Id = item.Id,
+                    UserId = userId,
+                    Name = item.Name ?? string.Empty,
+                    Description = item.Description ?? string.Empty,
+                    LastMessageText = item.LastMessageText ?? string.Empty,
+                    LastMessageTime = (DateTime)item.LastMessageTime,
+                    ChatType = "Group",
+                    UserReceiverName = string.Empty
+                };
+
+                result.Add(chatViewModel);
+            }
+
+            return result.OrderByDescending(x => x.LastMessageTime).ToList();
+        }
     }
 }
 
