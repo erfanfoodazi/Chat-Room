@@ -1,0 +1,115 @@
+@inherits LayoutComponentBase
+
+<div class="app-layout">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a class="brand" href="/app/chat">
+                <i class="fas fa-comment-dots me-2"></i>ChatRoom
+            </a>
+        </div>
+        <div class="sidebar-nav">
+            <NavLink class="nav-link" href="/app/chat" Match="NavLinkMatch.Prefix">
+                <i class="fas fa-comments me-2"></i> All Chats
+            </NavLink>
+            <NavLink class="nav-link" href="/app/chat/new">
+                <i class="fas fa-plus-circle me-2"></i> New Chat
+            </NavLink>
+            <NavLink class="nav-link" href="/app/profile">
+                <i class="fas fa-user me-2"></i> Profile
+            </NavLink>
+        </div>
+        <div class="sidebar-footer">
+            <a class="nav-link" href="/account/logout">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+        </div>
+    </nav>
+    <main class="main-content">
+        @Body
+    </main>
+</div>
+
+<style>
+    .app-layout {
+        display: flex;
+        height: 100vh;
+        background: #1a1a2e;
+        color: #e0e0e0;
+    }
+
+    .sidebar {
+        width: 260px;
+        background: #16213e;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255,255,255,0.06);
+        flex-shrink: 0;
+    }
+
+    .sidebar-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .brand {
+        color: #fff;
+        text-decoration: none;
+        font-size: 1.25rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+    }
+
+    .brand i { color: #0d6efd; }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 0.75rem 0;
+        overflow-y: auto;
+    }
+
+    .sidebar-footer {
+        padding: 0.75rem 0;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: #adb5bd;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+    }
+
+    .nav-link.active {
+        background: rgba(13,110,253,0.15);
+        color: #0d6efd;
+        border-right: 3px solid #0d6efd;
+    }
+
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @@media (max-width: 768px) {
+        .sidebar {
+            width: 60px;
+        }
+        .sidebar .brand span,
+        .sidebar .nav-link span {
+            display: none;
+        }
+        .sidebar-header { padding: 1rem 0.75rem; text-align: center; }
+        .nav-link { justify-content: center; padding: 0.75rem; }
+    }
+</style>

@@ -1,0 +1,188 @@
+@page "/app/chat/new"
+@layout ClientLayout
+@rendermode InteractiveWebAssembly
+@using System.Security.Claims
+@inject ChatApiClient Api
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider Auth
+
+<div class="new-chat-page">
+    <div class="page-header">
+        <button class="btn-back" @onclick="GoBack"><i class="fas fa-arrow-left"></i></button>
+        <h4 class="m-0">New Chat</h4>
+    </div>
+
+    <div class="search-section">
+        <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" class="form-control"
+                   placeholder="Search by username or email..."
+                   @bind="searchQuery"
+                   @onkeydown="HandleKeyDown" />
+            <button class="btn btn-primary" @onclick="SearchUser" disabled="@(string.IsNullOrWhiteSpace(searchQuery) || isSearching)">
+                @if (isSearching) { <span class="spinner-border spinner-border-sm"></span> }
+                else { <span>Find</span> }
+            </button>
+        </div>
+    </div>
+
+    <div class="results-section">
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger py-2">@error</div>
+        }
+
+        @if (foundUser is not null)
+        {
+            <div class="user-card" @onclick="StartChat">
+                <div class="avatar">@(foundUser.FullName.Length > 0 ? foundUser.FullName[0].ToString().ToUpper() : "?")</div>
+                <div class="user-info">
+                    <strong>@foundUser.FullName</strong>
+                    <small class="text-secondary">@@@foundUser.UserName</small>
+                </div>
+                <i class="fas fa-chevron-right text-secondary"></i>
+            </div>
+        }
+
+        @if (hasSearched && foundUser is null && string.IsNullOrEmpty(error))
+        {
+            <div class="empty-state">
+                <i class="fas fa-user-slash fa-2x text-secondary mb-2"></i>
+                <p class="text-secondary">No user found.</p>
+            </div>
+        }
+
+        @if (!hasSearched && string.IsNullOrEmpty(error))
+        {
+            <div class="empty-state">
+                <i class="fas fa-search fa-2x text-secondary mb-2"></i>
+                <p class="text-secondary">Search for someone to chat with.</p>
+            </div>
+        }
+    </div>
+
+    @* Group creation *@
+    <hr class="border-secondary my-3" />
+    <div class="create-group-section">
+        <h5 class="text-white mb-3"><i class="fas fa-users me-2"></i>Or create a Group</h5>
+        <div class="mb-2">
+            <input type="text" class="form-control" placeholder="Group name..." @bind="groupName" />
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Description (optional)..." @bind="groupDescription" />
+        </div>
+        <button class="btn btn-success w-100" @onclick="CreateGroup" disabled="@(string.IsNullOrWhiteSpace(groupName) || isCreatingGroup)">
+            @if (isCreatingGroup) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            <i class="fas fa-plus me-1"></i> Create Group
+        </button>
+    </div>
+</div>
+
+@code {
+    private string searchQuery = string.Empty;
+    private string error = string.Empty;
+    private bool isSearching;
+    private bool hasSearched;
+    private UserDto? foundUser;
+    private int currentUserId;
+
+    private string groupName = string.Empty;
+    private string groupDescription = string.Empty;
+    private bool isCreatingGroup;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await Auth.GetAuthenticationStateAsync();
+        var claim = state.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is not null) int.TryParse(claim.Value, out currentUserId);
+        if (currentUserId == 0) { Nav.NavigateTo("/account/login", true); return; }
+    }
+
+    private async Task SearchUser()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery)) return;
+        isSearching = true;
+        error = string.Empty;
+        foundUser = null;
+        hasSearched = true;
+        StateHasChanged();
+
+        try
+        {
+            foundUser = await Api.FindUserAsync(searchQuery.Trim());
+            if (foundUser?.Id == currentUserId)
+            {
+                error = "You can't start a chat with yourself.";
+                foundUser = null;
+            }
+        }
+        catch
+        {
+            error = "Search failed. Try again.";
+        }
+        finally
+        {
+            isSearching = false;
+        }
+    }
+
+    private async Task StartChat()
+    {
+        if (foundUser is null) return;
+        try
+        {
+            var chat = await Api.CreatePersonalChatAsync(currentUserId, foundUser.Id);
+            if (chat is not null)
+                Nav.NavigateTo($"/app/chat/personal/{chat.Id}");
+            else
+                error = "Failed to create chat.";
+        }
+        catch
+        {
+            error = "Failed to create chat.";
+        }
+    }
+
+    private async Task CreateGroup()
+    {
+        if (string.IsNullOrWhiteSpace(groupName)) return;
+        isCreatingGroup = true;
+        try
+        {
+            var group = await Api.CreateGroupChatAsync(groupName, groupDescription, currentUserId);
+            if (group is not null)
+                Nav.NavigateTo($"/app/chat/group/{group.Id}");
+        }
+        finally
+        {
+            isCreatingGroup = false;
+        }
+    }
+
+    private void GoBack() => Nav.NavigateTo("/app/chat");
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SearchUser();
+    }
+}
+
+<style>
+    .new-chat-page { padding: 1.5rem; max-width: 600px; margin: 0 auto; width: 100%; }
+    .page-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .page-header h4 { color: #fff; }
+    .btn-back { background: none; border: none; color: #adb5bd; font-size: 1.1rem; padding: 0.4rem 0.5rem; border-radius: 50%; cursor: pointer; }
+    .btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .search-section { margin-bottom: 1.5rem; }
+    .results-section { min-height: 100px; }
+    .empty-state { text-align: center; padding: 2rem 1rem; }
+    .user-card { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+    .user-card:hover { background: rgba(13,110,253,0.12); transform: translateX(3px); }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd, #6610f2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+    .user-info { flex: 1; color: #e0e0e0; }
+    .user-info strong { display: block; }
+    .create-group-section { padding-top: 0.5rem; }
+    .form-control { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #e0e0e0; }
+    .form-control:focus { border-color: #0d6efd; box-shadow: none; }
+    .input-group-text { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #6c757d; }
+</style>

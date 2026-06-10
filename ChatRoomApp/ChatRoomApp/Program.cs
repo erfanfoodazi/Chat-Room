@@ -95,6 +95,10 @@ app.UseAntiforgery();
 
 app.MapHub<ChatHub>("/chathub");
 app.MapAuthEndpoints();
+app.MapUsersEndpoints();
+app.MapPersonalChatsEndpoints();
+app.MapGroupChatsEndpoints();
+app.MapMessagesEndpoints();
 app.MapRazorPages();
 app.MapPost("/account/logout", async (SignInManager<User> signInManager) =>
 {

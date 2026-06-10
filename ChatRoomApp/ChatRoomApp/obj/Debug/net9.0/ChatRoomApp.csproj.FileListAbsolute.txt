@@ -331,4 +331,5 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\f
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\ei9ws3k8v6-e5hzqw8f2i.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.RazorAssemblyInfo.cache
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\ChatRoomApp.RazorAssemblyInfo.cs
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\bin\Debug\net9.0\Microsoft.AspNetCore.Components.WebAssembly.Authentication.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp\obj\Debug\net9.0\compressed\f32kn295nz-gcvjxldlff.gz

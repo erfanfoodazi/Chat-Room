@@ -1,15 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "tbDk74oG4eE=",
+  "dgSpecHash": "M/GPaEpKGc4=",
   "success": true,
   "projectFilePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.0\\microsoft.aspnetcore.authorization.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components\\9.0.0\\microsoft.aspnetcore.components.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\9.0.0\\microsoft.aspnetcore.components.analyzers.9.0.0.nupkg.sha512",
+    "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.authorization\\9.0.0\\microsoft.aspnetcore.components.authorization.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.forms\\9.0.0\\microsoft.aspnetcore.components.forms.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.web\\9.0.0\\microsoft.aspnetcore.components.web.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\9.0.0\\microsoft.aspnetcore.components.webassembly.9.0.0.nupkg.sha512",
+    "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly.authentication\\9.0.0\\microsoft.aspnetcore.components.webassembly.authentication.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly.devserver\\9.0.0\\microsoft.aspnetcore.components.webassembly.devserver.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\9.0.0\\microsoft.aspnetcore.connections.abstractions.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.http.connections.client\\9.0.0\\microsoft.aspnetcore.http.connections.client.9.0.0.nupkg.sha512",
@@ -43,15 +45,5 @@
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.15\\microsoft.netcore.app.ref.9.0.15.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\9.0.15\\microsoft.netcore.app.runtime.mono.browser-wasm.9.0.15.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp.Client\\ChatRoomApp.Client.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }

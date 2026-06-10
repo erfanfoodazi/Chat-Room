@@ -1,0 +1,206 @@
+@page "/app/chat"
+@layout ClientLayout
+@rendermode InteractiveWebAssembly
+@using System.Security.Claims
+@inject ChatApiClient Api
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider Auth
+
+<div class="chat-list-page">
+    <div class="page-header">
+        <h4><i class="fas fa-comments me-2"></i>Chats</h4>
+        <button class="btn btn-primary btn-sm" @onclick="GoToNewChat">
+            <i class="fas fa-plus"></i> New
+        </button>
+    </div>
+
+    <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-sm @(filter == "all" ? "btn-primary" : "btn-outline-secondary")"
+                @onclick="SetFilterAll">All</button>
+        <button class="btn btn-sm @(filter == "personal" ? "btn-primary" : "btn-outline-secondary")"
+                @onclick="SetFilterPersonal">Personal</button>
+        <button class="btn btn-sm @(filter == "group" ? "btn-primary" : "btn-outline-secondary")"
+                @onclick="SetFilterGroup">Groups</button>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-secondary mt-2">Loading chats...</p>
+        </div>
+    }
+    else if (!chats.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-comment-slash fa-3x text-secondary mb-3"></i>
+            <p class="text-secondary">No chats yet. Start a new conversation!</p>
+        </div>
+    }
+    else
+    {
+        <div class="chat-list">
+            @foreach (var chat in filteredChats)
+            {
+                <div class="chat-card" @onclick="() => OpenChat(chat)">
+                    <div class="chat-avatar">
+                        @if (chat.ChatType == "group")
+                        {
+                            <div class="avatar-circle group"><i class="fas fa-users"></i></div>
+                        }
+                        else
+                        {
+                            <div class="avatar-circle @(chat.IsOnline ? "online" : "")">
+                                @(chat.Name.Length > 0 ? chat.Name[0].ToString().ToUpper() : "?")
+                            </div>
+                        }
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-top">
+                            <strong class="chat-name">@chat.Name</strong>
+                            <small class="chat-time">@FormatTime(chat.LastMessageTime)</small>
+                        </div>
+                        <div class="chat-bottom">
+                            <span class="chat-preview">@(string.IsNullOrEmpty(chat.LastMessageText) ? "No messages yet" : chat.LastMessageText)</span>
+                            @if (chat.ChatType == "personal" && chat.IsOnline)
+                            {
+                                <span class="online-dot"></span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<ChatListItem> chats = new();
+    private List<ChatListItem> filteredChats => filter switch
+    {
+        "personal" => chats.Where(c => c.ChatType == "personal").ToList(),
+        "group" => chats.Where(c => c.ChatType == "group").ToList(),
+        _ => chats
+    };
+    private bool isLoading = true;
+    private int currentUserId;
+    private string filter = "all";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserId();
+        if (currentUserId == 0) { Nav.NavigateTo("/account/login", true); return; }
+        await LoadChats();
+    }
+
+    private async Task GetCurrentUserId()
+    {
+        var state = await Auth.GetAuthenticationStateAsync();
+        var claim = state.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is not null) int.TryParse(claim.Value, out currentUserId);
+    }
+
+    private async Task LoadChats()
+    {
+        try
+        {
+            isLoading = true;
+            var results = new List<ChatListItem>();
+
+            var personalChats = await Api.GetPersonalChatsAsync(currentUserId);
+            foreach (var pc in personalChats)
+            {
+                var otherId = pc.UserOneId == currentUserId ? pc.UserTwoId : pc.UserOneId;
+                var user = await Api.GetUserByIdAsync(otherId);
+                results.Add(new ChatListItem
+                {
+                    Id = pc.Id,
+                    Name = user?.FullName ?? user?.UserName ?? "Unknown",
+                    LastMessageText = pc.LastMessageText ?? string.Empty,
+                    LastMessageTime = pc.LastMessageTime ?? pc.CreatedAt,
+                    ChatType = "personal",
+                    OtherUserId = otherId,
+                    IsOnline = user?.IsOnline ?? false,
+                });
+            }
+
+            var groupChats = await Api.GetGroupChatsAsync(currentUserId);
+            foreach (var gc in groupChats)
+            {
+                results.Add(new ChatListItem
+                {
+                    Id = gc.Id,
+                    Name = gc.Name,
+                    Description = gc.Description,
+                    LastMessageText = gc.LastMessageText ?? string.Empty,
+                    LastMessageTime = gc.LastMessageTime ?? gc.CreatedAt,
+                    ChatType = "group",
+                });
+            }
+
+            chats = results.OrderByDescending(c => c.LastMessageTime).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading chats: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenChat(ChatListItem chat)
+    {
+        if (chat.ChatType == "personal")
+            Nav.NavigateTo($"/app/chat/personal/{chat.Id}");
+        else
+            Nav.NavigateTo($"/app/chat/group/{chat.Id}");
+    }
+
+    private void SetFilterAll() { filter = "all"; StateHasChanged(); }
+    private void SetFilterPersonal() { filter = "personal"; StateHasChanged(); }
+    private void SetFilterGroup() { filter = "group"; StateHasChanged(); }
+
+    private void GoToNewChat() => Nav.NavigateTo("/app/chat/new");
+
+    private static string FormatTime(DateTime time)
+    {
+        var diff = DateTime.Now - time;
+        if (diff.TotalMinutes < 1) return "now";
+        if (diff.TotalHours < 1) return $"{(int)diff.TotalMinutes}m";
+        if (diff.TotalDays < 1) return $"{(int)diff.TotalHours}h";
+        if (diff.TotalDays < 7) return $"{(int)diff.TotalDays}d";
+        return time.ToString("MMM dd");
+    }
+}
+
+<style>
+    .chat-list-page { padding: 1.5rem; max-width: 700px; margin: 0 auto; width: 100%; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .page-header h4 { margin: 0; color: #fff; }
+    .empty-state { text-align: center; padding: 4rem 1rem; }
+    .chat-list { display: flex; flex-direction: column; gap: 2px; }
+    .chat-card {
+        display: flex; gap: 0.875rem; padding: 0.875rem 1rem;
+        background: rgba(255,255,255,0.03); border-radius: 10px;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .chat-card:hover { background: rgba(255,255,255,0.07); transform: translateX(3px); }
+    .chat-avatar { flex-shrink: 0; }
+    .avatar-circle {
+        width: 48px; height: 48px; border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-weight: 700; font-size: 1.1rem;
+    }
+    .avatar-circle.group { background: linear-gradient(135deg, #198754, #20c997); }
+    .avatar-circle.online { box-shadow: 0 0 0 3px #198754; }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-top { display: flex; justify-content: space-between; align-items: baseline; }
+    .chat-name { color: #fff; font-size: 0.95rem; }
+    .chat-time { color: #6c757d; font-size: 0.75rem; white-space: nowrap; }
+    .chat-bottom { display: flex; align-items: center; gap: 0.5rem; margin-top: 3px; }
+    .chat-preview { color: #6c757d; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #198754; flex-shrink: 0; }
+</style>

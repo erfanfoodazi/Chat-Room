@@ -1,0 +1,264 @@
+@page "/app/chat/personal/{ChatId:int}"
+@page "/app/chat/group/{ChatId:int}"
+@layout ClientLayout
+@rendermode InteractiveWebAssembly
+@using System.Security.Claims
+@inject ChatApiClient Api
+@inject ChatHubClientService ChatHub
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider Auth
+
+<div class="chat-room">
+    <div class="chat-header">
+        <button class="btn-back" @onclick="GoBack"><i class="fas fa-arrow-left"></i></button>
+        <div class="chat-header-info">
+            <h5 class="m-0">@chatName</h5>
+            <small class="text-secondary">@statusText</small>
+        </div>
+    </div>
+
+    <div class="messages-area" @ref="messagesContainer">
+        @if (isLoading)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        }
+        else if (!messages.Any())
+        {
+            <div class="empty-state">
+                <p class="text-secondary">No messages yet. Say hello!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var msg in messages)
+            {
+                var isMine = msg.SenderId == currentUserId;
+                <div class="message @(isMine ? "mine" : "theirs")">
+                    @if (!isMine && isGroupChat)
+                    {
+                        <small class="sender-name">@msg.SenderName</small>
+                    }
+                    <div class="bubble @(isMine ? "bubble-mine" : "bubble-theirs")">
+                        @if (msg.ReplyToMessageId.HasValue)
+                        {
+                            <div class="reply-preview">Replying to a message</div>
+                        }
+                        <div class="msg-text">@msg.Text</div>
+                        <div class="msg-meta">
+                            <span class="msg-time">@msg.SentTime.ToShortTimeString()</span>
+                            @if (isMine)
+                            {
+                                @if (msg.IsSeen) { <i class="fas fa-check-double text-info ms-1" style="font-size:0.7rem"></i> }
+                                else if (msg.IsDelivered) { <i class="fas fa-check-double text-secondary ms-1" style="font-size:0.7rem"></i> }
+                                else { <i class="fas fa-check text-secondary ms-1" style="font-size:0.7rem"></i> }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="message-input">
+        <textarea class="form-control"
+                  rows="1"
+                  placeholder="Type a message..."
+                  @bind="messageText"
+                  @onkeydown="HandleKeyDown"
+                  disabled="isLoading" />
+        <button class="btn btn-primary send-btn"
+                @onclick="SendMessage"
+                disabled="@(string.IsNullOrWhiteSpace(messageText) || isLoading)">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int ChatId { get; set; }
+
+    private List<MessageDto> messages = new();
+    private string messageText = string.Empty;
+    private string chatName = "Loading...";
+    private string statusText = string.Empty;
+    private bool isLoading = true;
+    private bool isGroupChat;
+    private int currentUserId;
+    private ElementReference messagesContainer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserId();
+        if (currentUserId == 0) { Nav.NavigateTo("/account/login", true); return; }
+        var uri = new Uri(Nav.Uri);
+        isGroupChat = uri.AbsolutePath.StartsWith("/app/chat/group", StringComparison.OrdinalIgnoreCase);
+        await LoadChat();
+        await ConnectToHub();
+    }
+
+    private async Task GetCurrentUserId()
+    {
+        var state = await Auth.GetAuthenticationStateAsync();
+        var claim = state.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is not null) int.TryParse(claim.Value, out currentUserId);
+    }
+
+    private async Task LoadChat()
+    {
+        try
+        {
+            isLoading = true;
+
+            if (isGroupChat)
+            {
+                var group = await Api.GetGroupChatAsync(ChatId);
+                if (group is null) { Nav.NavigateTo("/app/chat"); return; }
+                chatName = group.Name;
+                statusText = $"{group.Members.Count} members";
+                messages = group.Messages.OrderBy(m => m.SentTime).ToList();
+            }
+            else
+            {
+                var chat = await Api.GetPersonalChatAsync(ChatId);
+                if (chat is null) { Nav.NavigateTo("/app/chat"); return; }
+                var otherId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
+                var user = await Api.GetUserByIdAsync(otherId);
+                chatName = user?.FullName ?? user?.UserName ?? "Unknown";
+                statusText = user?.IsOnline == true ? "Online" : "Offline";
+                messages = chat.Messages.OrderBy(m => m.SentTime).ToList();
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ConnectToHub()
+    {
+        if (!ChatHub.IsConnected)
+            await ChatHub.StartAsync();
+
+        if (isGroupChat)
+            await ChatHub.JoinGroup(ChatId);
+
+        ChatHub.OnPersonalMessageReceived += OnPersonalMessage;
+        ChatHub.OnGroupMessageReceived += OnGroupMessage;
+    }
+
+    private void OnPersonalMessage(MessageDto msg)
+    {
+        if (!isGroupChat && (msg.PersonalChatId == ChatId || msg.SenderId != currentUserId))
+        {
+            messages.Add(msg);
+            StateHasChanged();
+        }
+    }
+
+    private void OnGroupMessage(MessageDto msg)
+    {
+        if (isGroupChat && msg.GroupChatId == ChatId)
+        {
+            messages.Add(msg);
+            StateHasChanged();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(messageText)) return;
+        var text = messageText;
+        messageText = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            if (isGroupChat)
+            {
+                await ChatHub.SendGroupMessage(ChatId, text);
+            }
+            else
+            {
+                var chat = await Api.GetPersonalChatAsync(ChatId);
+                if (chat is null) return;
+                var receiverId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
+                await ChatHub.SendPersonalMessage(receiverId, text);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Send failed: {ex.Message}");
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+
+    private void GoBack() => Nav.NavigateTo("/app/chat");
+}
+
+<style>
+    .chat-room { display: flex; flex-direction: column; height: 100vh; }
+    .chat-header {
+        display: flex; align-items: center; gap: 1rem;
+        padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+        background: #16213e;
+    }
+    .btn-back {
+        background: none; border: none; color: #adb5bd; font-size: 1.1rem;
+        padding: 0.5rem; border-radius: 50%; cursor: pointer;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .messages-area {
+        flex: 1; overflow-y: auto; padding: 1rem;
+        display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .empty-state { text-align: center; padding: 4rem 1rem; }
+
+    .message { display: flex; flex-direction: column; max-width: 75%; }
+    .message.mine { align-self: flex-end; }
+    .message.theirs { align-self: flex-start; }
+
+    .sender-name { font-size: 0.75rem; color: #0d6efd; margin-bottom: 2px; margin-left: 4px; }
+
+    .bubble {
+        padding: 0.5rem 0.875rem; border-radius: 18px;
+        position: relative; word-wrap: break-word;
+    }
+    .bubble-mine {
+        background: #0d6efd; color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+    .bubble-theirs {
+        background: rgba(255,255,255,0.08); color: #e0e0e0;
+        border-bottom-left-radius: 4px;
+    }
+    .reply-preview {
+        font-size: 0.75rem; opacity: 0.7; padding: 2px 0 4px;
+        border-left: 2px solid currentColor; padding-left: 6px; margin-bottom: 4px;
+    }
+    .msg-meta { display: flex; align-items: center; justify-content: flex-end; gap: 2px; margin-top: 2px; }
+    .msg-time { font-size: 0.65rem; opacity: 0.7; }
+
+    .message-input {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem 1rem; border-top: 1px solid rgba(255,255,255,0.06);
+        background: #16213e;
+    }
+    .message-input textarea {
+        resize: none; background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1); color: #e0e0e0;
+        border-radius: 24px; padding: 0.6rem 1rem; flex: 1;
+        max-height: 120px;
+    }
+    .message-input textarea:focus { border-color: #0d6efd; box-shadow: none; }
+    .send-btn { border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+</style>

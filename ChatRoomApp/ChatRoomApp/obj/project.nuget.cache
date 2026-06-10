@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vFdu8Q4HmSQ=",
+  "dgSpecHash": "OOktYlQuGxU=",
   "success": true,
   "projectFilePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
   "expectedPackageFiles": [
@@ -12,9 +12,11 @@
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.0\\microsoft.aspnetcore.authorization.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components\\9.0.0\\microsoft.aspnetcore.components.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\9.0.0\\microsoft.aspnetcore.components.analyzers.9.0.0.nupkg.sha512",
+    "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.authorization\\9.0.0\\microsoft.aspnetcore.components.authorization.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.forms\\9.0.0\\microsoft.aspnetcore.components.forms.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.web\\9.0.0\\microsoft.aspnetcore.components.web.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\9.0.0\\microsoft.aspnetcore.components.webassembly.9.0.0.nupkg.sha512",
+    "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly.authentication\\9.0.0\\microsoft.aspnetcore.components.webassembly.authentication.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly.server\\9.0.0\\microsoft.aspnetcore.components.webassembly.server.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\9.0.0\\microsoft.aspnetcore.connections.abstractions.9.0.0.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\9.0.0\\microsoft.aspnetcore.cryptography.internal.9.0.0.nupkg.sha512",
@@ -123,15 +125,5 @@
     "C:\\Users\\Erfani\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\Erfani\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\code\\NewJob\\Cs\\ChatRoom\\ChatRoomApp\\ChatRoomApp\\ChatRoomApp.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }
