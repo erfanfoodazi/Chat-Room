@@ -35,6 +35,7 @@ namespace Application.Users.UseCases.Queries
                 Email = user.Email,
                 Bio = user.Bio,
                 ProfilePictureUrl = user.ProfilePictureUrl,
+                IsOnline = user.IsOnline,
                 CreatedAt = user.CreatedAt,
                 LastSeen = user.LastSeen,
             };

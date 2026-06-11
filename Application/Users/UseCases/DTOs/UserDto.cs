@@ -15,6 +15,7 @@ namespace Application.Users.UseCases.DTOs
         public string UserName { get; set; } = string.Empty;
         public string Bio { get; set; } = string.Empty;
         public string ProfilePictureUrl { get; set; } = string.Empty;
+        public bool IsOnline { get; set; }
         public DateTime LastSeen { get; set; }
         public DateTime CreatedAt { get; set; }
         public virtual ICollection<PersonalChat> PersonalChats { get; set; } = new List<PersonalChat>();

@@ -11,6 +11,7 @@ namespace Application.Users.UseCases.Commands
     public class SetOnlineOrOfflineCommand : IRequest<bool>
     {
         public int UserId { get; set; }
+        public bool IsOnline { get; set; }
     }
 
     public class SetOnlineOrOfflineCommandHandler : IRequestHandler<SetOnlineOrOfflineCommand, bool>
@@ -22,7 +23,7 @@ namespace Application.Users.UseCases.Commands
         }
         public async Task<bool> Handle(SetOnlineOrOfflineCommand request, CancellationToken cancellationToken)
         {
-            var result = await _userRepository.MakeUserOnlineOrOffline(request.UserId);
+            var result = await _userRepository.SetUserOnlineStatus(request.UserId, request.IsOnline);
             return result;
         }
     }

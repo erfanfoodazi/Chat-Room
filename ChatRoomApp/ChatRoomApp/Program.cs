@@ -22,6 +22,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
 builder.Services.AddScoped<IPersonalChatRepository, PersonalChatRepository>();
 builder.Services.AddScoped<IChatListService, ChatListService>();
+builder.Services.AddSingleton<MessageBroadcastService>();
 builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, NameUserIdProvider>();
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>

@@ -36,20 +36,19 @@ namespace ChatRoomApp.ViewModels.Chat
                 {
                     Id = item.Id,
                     UserId = userId,
-                    LastMessageText = item.LastMessageText ?? string.Empty,
-                    LastMessageTime = (DateTime)item.LastMessageTime,
+                    LastMessageText = item.Messages[item.Messages.Count - 1].Text ?? string.Empty,
+                    LastMessageTime = item.Messages[item.Messages.Count - 1].SentTime,
                     ChatType = "Personal"
                 };
 
                 // Determine the other user's name
                 var otherUserId = item.UserOneId == userId ? item.UserTwoId : item.UserOneId;
-                var userQuery = new GetUserByIdQuery { UserId = otherUserId }; // Assuming you have this query
+                var userQuery = new GetUserByIdQuery { UserId = otherUserId }; 
                 var user = await mediator.Send(userQuery);
 
                 chatViewModel.Name = user?.UserName ?? "Unknown User";
                 chatViewModel.UserReceiverName = user?.UserName ?? string.Empty;
                 chatViewModel.Description = $"Chat with {chatViewModel.Name}";
-
                 result.Add(chatViewModel);
             }
 
@@ -66,11 +65,13 @@ namespace ChatRoomApp.ViewModels.Chat
                     Name = item.Name ?? string.Empty,
                     Description = item.Description ?? string.Empty,
                     LastMessageText = item.LastMessageText ?? string.Empty,
-                    LastMessageTime = (DateTime)item.LastMessageTime,
                     ChatType = "Group",
                     UserReceiverName = string.Empty // Not applicable for groups
                 };
-
+                if (item.LastMessageTime.HasValue)
+                {
+                    chatViewModel.LastMessageTime = item.LastMessageTime.Value;
+                }
                 result.Add(chatViewModel);
             }
 
@@ -93,8 +94,8 @@ namespace ChatRoomApp.ViewModels.Chat
                 {
                     Id = item.Id,
                     UserId = userId,
-                    LastMessageText = item.LastMessageText ?? string.Empty,
-                    LastMessageTime = (DateTime)item.LastMessageTime,
+                    LastMessageText = item.Messages[item.Messages.Count - 1].Text ?? string.Empty,
+                    LastMessageTime = item.Messages[item.Messages.Count - 1].SentTime,
                     ChatType = "Personal"
                 };
 
@@ -105,7 +106,7 @@ namespace ChatRoomApp.ViewModels.Chat
                 chatViewModel.Name = user?.UserName ?? "Unknown User";
                 chatViewModel.UserReceiverName = user?.UserName ?? string.Empty;
                 chatViewModel.Description = $"Chat with {chatViewModel.Name}";
-
+                
                 result.Add(chatViewModel);
             }
 
@@ -130,31 +131,18 @@ namespace ChatRoomApp.ViewModels.Chat
                     Name = item.Name ?? string.Empty,
                     Description = item.Description ?? string.Empty,
                     LastMessageText = item.LastMessageText ?? string.Empty,
-                    LastMessageTime = (DateTime)item.LastMessageTime,
+                    //LastMessageTime = item.Messages[item.Messages.Count - 1].,
                     ChatType = "Group",
                     UserReceiverName = string.Empty
                 };
-
+                if (item.LastMessageTime.HasValue)
+                {
+                    chatViewModel.LastMessageTime = item.LastMessageTime.Value;
+                }
                 result.Add(chatViewModel);
             }
 
             return result.OrderByDescending(x => x.LastMessageTime).ToList();
         }
-    }
-}
-
-// Additional query if needed
-namespace Application.Users.UseCases.Queries
-{
-    public class GetUserByIdQuery : IRequest<UserDto>
-    {
-        public int UserId { get; set; }
-    }
-
-    public class UserDto
-    {
-        public int Id { get; set; }
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
     }
 }

@@ -1,0 +1,481 @@
+@page "/chat/personal/{ChatId:int}"
+@page "/chat/group/{ChatId:int}"
+@rendermode InteractiveServer
+@using Application.PersonalChats.UseCases.Queries
+@using Application.PersonalChats.UseCases.Commands
+@using Application.GroupChats.UseCases.Queries
+@using Application.GroupChats.UseCases.Commands
+@using Application.Messages.UseCases.Dto
+@using Application.Users.UseCases.Queries
+@using Application.Users.UseCases.DTOs
+@using ChatRoomApp.Services
+@using MediatR
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR
+@using Microsoft.JSInterop
+@implements IDisposable
+@inject IMediator Mediator
+@inject IHubContext<Hubs.ChatHub> HubContext
+@inject MessageBroadcastService BroadcastService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
+
+<div class="chat-room d-flex flex-column">
+    <div class="chat-header d-flex align-items-center gap-3 px-4 py-3">
+        <button class="btn-back" @onclick="GoBack" type="button" title="Back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="chat-header-info flex-grow-1">
+            <h5 class="m-0">@chatName</h5>
+            <small class="text-secondary">@statusText</small>
+        </div>
+    </div>
+
+    <div class="messages-area flex-grow-1 px-4 py-3" @ref="messagesContainer">
+        @if (isLoading)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        }
+        else if (!messages.Any())
+        {
+            <div class="empty-state text-center py-5">
+                <i class="fas fa-comment-slash fa-3x text-secondary mb-3"></i>
+                <p class="text-secondary">No messages yet. Say hello!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var msg in messages)
+            {
+                var isMine = msg.SenderId == currentUserId;
+                <div class="message @(isMine ? "mine" : "theirs")">
+                    @if (!isMine && isGroupChat)
+                    {
+                        <small class="sender-name">@GetSenderName(msg.SenderId)</small>
+                    }
+                    <div class="bubble @(isMine ? "bubble-mine" : "bubble-theirs")">
+                        @if (msg.ReplyToMessageId.HasValue)
+                        {
+                            <div class="reply-preview">Replying to a message</div>
+                        }
+                        <div class="msg-text">@msg.Text</div>
+                        <div class="msg-meta d-flex align-items-center justify-content-end gap-1">
+                            <span class="msg-time">@msg.SentTime.ToShortTimeString()</span>
+                            @if (isMine)
+                            {
+                                @if (msg.IsSeen)
+                                {
+                                    <i class="fas fa-check-double text-info" style="font-size:0.65rem"></i>
+                                }
+                                else if (msg.IsDelivered)
+                                {
+                                    <i class="fas fa-check-double text-secondary" style="font-size:0.65rem"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-check text-secondary" style="font-size:0.65rem"></i>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="message-input d-flex align-items-center gap-3 px-4 py-3">
+        <textarea class="form-control"
+                  rows="1"
+                  placeholder="Type a message..."
+                  @bind="messageText"
+                  @onkeydown="HandleKeyDown"
+                  disabled="@isLoading" />
+        <button class="btn btn-primary send-btn"
+                @onclick="SendMessage"
+                disabled="@(string.IsNullOrWhiteSpace(messageText) || isSending)">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int ChatId { get; set; }
+
+    private List<MessageDto> messages = new();
+    private string messageText = string.Empty;
+    private string chatName = "Loading...";
+    private string statusText = string.Empty;
+    private bool isLoading = true;
+    private bool isSending;
+    private bool isGroupChat;
+    private int currentUserId;
+    private int otherUserId;
+    private Dictionary<int, string> senderNames = new();
+    private ElementReference messagesContainer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserId();
+        if (currentUserId == 0) { Navigation.NavigateTo("/account/login"); return; }
+
+        var uri = new Uri(Navigation.Uri);
+        isGroupChat = uri.AbsolutePath.StartsWith("/chat/group", StringComparison.OrdinalIgnoreCase);
+
+        BroadcastService.OnPersonalMessageReceived += HandlePersonalMessage;
+        BroadcastService.OnGroupMessageReceived += HandleGroupMessage;
+
+        await LoadChat();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ScrollToBottom();
+    }
+
+    private async Task GetCurrentUserId()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            currentUserId = userId;
+        }
+    }
+
+    private async Task LoadChat()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            if (isGroupChat)
+            {
+                var group = await Mediator.Send(new GetGroupChatByIdQuery { GroupId = ChatId });
+                if (group is null) { Navigation.NavigateTo("/chat"); return; }
+
+                chatName = group.Name;
+                statusText = $"{group.Members.Count} members";
+                messages = group.Messages.OrderBy(m => m.SentTime).ToList();
+
+                foreach (var member in group.Members)
+                {
+                    var user = await Mediator.Send(new GetUserByIdQuery { UserId = member.UserId });
+                    if (user != null)
+                        senderNames[member.UserId] = user.FullName ?? user.UserName ?? "Unknown";
+                }
+            }
+            else
+            {
+                var chat = await Mediator.Send(new GetPersonalChatByIdQuery { PersonalId = ChatId });
+                if (chat is null) { Navigation.NavigateTo("/chat"); return; }
+
+                otherUserId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
+                var user = await Mediator.Send(new GetUserByIdQuery { UserId = otherUserId });
+                chatName = user?.FullName ?? user?.UserName ?? "Unknown";
+                statusText = user?.IsOnline == true ? "Online" : "Offline";
+                messages = chat.Messages.OrderBy(m => m.SentTime).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading chat: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(messageText) || isSending) return;
+
+        var text = messageText;
+        messageText = string.Empty;
+        isSending = true;
+        StateHasChanged();
+
+        try
+        {
+            if (isGroupChat)
+            {
+                var msg = await Mediator.Send(new SendMessageToGroupCommand
+                {
+                    GroupId = ChatId,
+                    SenderId = currentUserId,
+                    Text = text,
+                });
+
+                if (msg != null)
+                {
+                    messages.Add(msg);
+                    await HubContext.Clients.Group(ChatId.ToString())
+                        .SendAsync("ReceiveGroupMessage", msg);
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                var msg = await Mediator.Send(new SendPersonalMessageCommand
+                {
+                    SenderId = currentUserId,
+                    ReceiverId = otherUserId,
+                    PersonalChatId = ChatId,
+                    Text = text,
+                });
+
+                if (msg != null)
+                {
+                    messages.Add(msg);
+                    await HubContext.Clients.User(otherUserId.ToString())
+                        .SendAsync("ReceivePersonalMessage", msg);
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Send failed: {ex.Message}");
+        }
+        finally
+        {
+            isSending = false;
+        }
+    }
+
+    private void HandlePersonalMessage(MessageDto msg)
+    {
+        if (!isGroupChat && msg.PersonalChatId == ChatId)
+        {
+            messages.Add(msg);
+            InvokeAsync(StateHasChanged);
+            InvokeAsync(ScrollToBottom);
+        }
+    }
+
+    private void HandleGroupMessage(MessageDto msg)
+    {
+        if (isGroupChat && msg.GroupChatId == ChatId)
+        {
+            if (!senderNames.ContainsKey(msg.SenderId))
+            {
+                _ = LoadSenderNameAsync(msg.SenderId);
+            }
+            messages.Add(msg);
+            InvokeAsync(StateHasChanged);
+            InvokeAsync(ScrollToBottom);
+        }
+    }
+
+    private async Task LoadSenderNameAsync(int userId)
+    {
+        try
+        {
+            var user = await Mediator.Send(new GetUserByIdQuery { UserId = userId });
+            if (user != null)
+            {
+                senderNames[userId] = user.FullName ?? user.UserName ?? "Unknown";
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch { }
+    }
+
+    private string GetSenderName(int userId)
+    {
+        return senderNames.TryGetValue(userId, out var name) ? name : "Unknown";
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", "document.querySelector('.messages-area')?.scrollTo(0, document.querySelector('.messages-area')?.scrollHeight)");
+        }
+        catch { }
+    }
+
+    private void GoBack()
+    {
+        if (isGroupChat)
+            Navigation.NavigateTo("/chat/group");
+        else
+            Navigation.NavigateTo("/chat/personal");
+    }
+
+    public void Dispose()
+    {
+        BroadcastService.OnPersonalMessageReceived -= HandlePersonalMessage;
+        BroadcastService.OnGroupMessageReceived -= HandleGroupMessage;
+    }
+}
+
+<style>
+    .chat-room {
+        height: calc(100vh - 60px);
+        background: #1a1a2e;
+    }
+
+    .chat-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: #16213e;
+        flex-shrink: 0;
+    }
+
+    .chat-header h5 {
+        color: #fff;
+    }
+
+    .btn-back {
+        background: none;
+        border: none;
+        color: #adb5bd;
+        font-size: 1.2rem;
+        padding: 8px 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .messages-area {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1rem;
+    }
+
+    .message {
+        display: flex;
+        flex-direction: column;
+        max-width: 75%;
+    }
+
+    .message.mine {
+        align-self: flex-end;
+    }
+
+    .message.theirs {
+        align-self: flex-start;
+    }
+
+    .sender-name {
+        font-size: 0.75rem;
+        color: #0d6efd;
+        margin-bottom: 2px;
+        margin-left: 4px;
+    }
+
+    .bubble {
+        padding: 0.5rem 0.875rem;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .bubble-mine {
+        background: #0d6efd;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+
+    .bubble-theirs {
+        background: rgba(255, 255, 255, 0.08);
+        color: #e0e0e0;
+        border-bottom-left-radius: 4px;
+    }
+
+    .reply-preview {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        padding: 2px 0 4px;
+        border-left: 2px solid currentColor;
+        padding-left: 6px;
+        margin-bottom: 4px;
+    }
+
+    .msg-meta {
+        margin-top: 2px;
+    }
+
+    .msg-time {
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+
+    .message-input {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background: #16213e;
+        flex-shrink: 0;
+    }
+
+    .message-input textarea {
+        resize: none;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+        border-radius: 24px;
+        padding: 0.6rem 1rem;
+        flex: 1;
+        max-height: 120px;
+    }
+
+    .message-input textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: none;
+    }
+
+    .message-input textarea::placeholder {
+        color: #6c757d;
+    }
+
+    .send-btn {
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    @@media (max-width: 768px) {
+        .chat-room {
+            height: calc(100vh - 50px);
+        }
+
+        .message {
+            max-width: 85%;
+        }
+    }
+</style>

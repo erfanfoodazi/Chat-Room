@@ -98,7 +98,7 @@ namespace Infrastructure.Repositories
             return user;
         }
 
-        public async Task<bool> MakeUserOnlineOrOffline(int userId)
+        public async Task<bool> SetUserOnlineStatus(int userId, bool isOnline)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
@@ -106,14 +106,11 @@ namespace Infrastructure.Repositories
                 _logger.LogWarning("User with ID {UserId} not found", userId);
                 return false;
             }
-            if (user.IsOnline)
-            {
-                user.SetOffline();
-            }
-            else 
-            {
+            
+            if (isOnline)
                 user.SetOnline();
-            }
+            else
+                user.SetOffline();
             
             await _userManager.UpdateAsync(user);
             return user.IsOnline;

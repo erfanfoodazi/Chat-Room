@@ -1,7 +1,10 @@
 ﻿using Application.GroupChats.UseCases.Commands;
+using Application.Interfaces;
 using Application.Messages.UseCases.Commands;
+using Application.Messages.UseCases.Dto;
 using Application.PersonalChats.UseCases.Commands;
 using Application.Users.UseCases.Commands;
+using ChatRoomApp.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -12,10 +15,14 @@ namespace ChatRoomApp.Hubs;
 public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
+    private readonly MessageBroadcastService _broadcastService;
+    private readonly IPersonalChatRepository _personalChatRepository;
 
-    public ChatHub(IMediator mediator)
+    public ChatHub(IMediator mediator, MessageBroadcastService broadcastService, IPersonalChatRepository personalChatRepository)
     {
         _mediator = mediator;
+        _broadcastService = broadcastService;
+        _personalChatRepository = personalChatRepository;
     }
 
     // ─── Connection ───────────────────────────────────────────
@@ -24,7 +31,7 @@ public class ChatHub : Hub
         var userId = GetUserId();
         if (userId != 0)
         {
-            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId });
+            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = true });
             await Clients.Others.SendAsync("UserConnected", userId);
         }
         await base.OnConnectedAsync();
@@ -35,7 +42,7 @@ public class ChatHub : Hub
         var userId = GetUserId();
         if (userId != 0)
         {
-            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId });
+            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = false });
             await Clients.Others.SendAsync("UserDisconnected", userId);
         }
         await base.OnDisconnectedAsync(exception);
@@ -45,18 +52,30 @@ public class ChatHub : Hub
     public async Task SendPersonalMessage(int receiverId, string text, int? replyToMessageId = null)
     {
         var senderId = GetUserId();
+        if (senderId == 0) return;
+
+        var personalChatId = await _personalChatRepository.ExistChat(senderId, receiverId);
+        if (personalChatId == 0)
+            return;
+
         var message = await _mediator.Send(new SendPersonalMessageCommand
         {
             SenderId = senderId,
             ReceiverId = receiverId,
+            PersonalChatId = personalChatId,
             Text = text,
             ReplyToMessageId = replyToMessageId,
         });
+
+        if (message == null) return;
 
         // Send to receiver
         await Clients.User(receiverId.ToString()).SendAsync("ReceivePersonalMessage", message);
         // Send back to sender
         await Clients.Caller.SendAsync("ReceivePersonalMessage", message);
+
+        // Notify server-side Blazor components
+        _broadcastService.NotifyPersonalMessage(message);
     }
 
     // ─── Group Chat ───────────────────────────────────────────
@@ -83,13 +102,19 @@ public class ChatHub : Hub
             ReplyToMessageId = replyToMessageId,
         });
 
+        if (message == null) return;
+
         await Clients.Group(groupId.ToString()).SendAsync("ReceiveGroupMessage", message);
+
+        // Notify server-side Blazor components
+        _broadcastService.NotifyGroupMessage(message);
     }
 
     // ─── Message Status ───────────────────────────────────────
     public async Task MarkMessageDelivered(int messageId)
     {
         await _mediator.Send(new MakeMessageDeliveredCommand { MessageId = messageId });
+        await Clients.Caller.SendAsync("MessageDelivered", messageId);
     }
 
     public async Task MarkMessageSeen(int messageId, int senderId)
@@ -102,6 +127,6 @@ public class ChatHub : Hub
     private int GetUserId()
     {
         var claim = Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        return claim != null ? int.Parse(claim.Value) : 0;
+        return claim != null && int.TryParse(claim.Value, out var userId) ? userId : 0;
     }
 }

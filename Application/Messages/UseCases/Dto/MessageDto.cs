@@ -24,6 +24,7 @@ namespace Application.Messages.UseCases.Dto
         public DateTime? DeletedTime { get; set; }
 
         public int SenderId { get; set; }
+        public string SenderName { get; set; } = string.Empty;
         public int? ReceiverId { get; set; }
         public int? PersonalChatId { get; set; }
         public int? GroupChatId { get; set; }

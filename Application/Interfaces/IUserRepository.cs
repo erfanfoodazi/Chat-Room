@@ -16,7 +16,7 @@ namespace Application.Interfaces
         Task<User> GetUserByPhoneNumberAsync(string phoneNumber);
         Task<User> GetUserByUsernameAsync(string username);
         Task<bool> UpdateUserAsync(User user);
-        Task<bool> MakeUserOnlineOrOffline(int userId);
+        Task<bool> SetUserOnlineStatus(int userId, bool isOnline);
         Task<bool> ChangeUserPassword(int userId, string currentPassword, string newPassword);
     }
 }

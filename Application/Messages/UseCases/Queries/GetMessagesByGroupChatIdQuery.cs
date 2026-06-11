@@ -17,9 +17,11 @@ namespace Application.Messages.UseCases.Queries
     public class GetMessagesByGrpupChatIdQueryHandler : IRequestHandler<GetMessagesByGroupChatIdQuery, List<MessageDto>>
     {
         private readonly IMessageRepository _messageRepository;
-        public GetMessagesByGrpupChatIdQueryHandler(IMessageRepository messageRepository)
+        private readonly IUserRepository _userRepository;
+        public GetMessagesByGrpupChatIdQueryHandler(IMessageRepository messageRepository, IUserRepository userRepository)
         {
             _messageRepository = messageRepository;
+            _userRepository = userRepository;
         }
         public async Task<List<MessageDto>> Handle(GetMessagesByGroupChatIdQuery request, CancellationToken cancellationToken)
         {
@@ -27,11 +29,20 @@ namespace Application.Messages.UseCases.Queries
             if (messages == null || !messages.Any())
                 return new List<MessageDto>();
 
+            var senderIds = messages.Select(m => m.SenderId).Distinct().ToList();
+            var senderNames = new Dictionary<int, string>();
+            foreach (var sid in senderIds)
+            {
+                var u = await _userRepository.GetUserByIdAsync(sid);
+                senderNames[sid] = u?.FullName ?? u?.UserName ?? string.Empty;
+            }
+
             return messages.Select(message => new MessageDto()
             {
                 Id = message.Id,
                 Text = message.Text,
                 SenderId = message.SenderId,
+                SenderName = senderNames.GetValueOrDefault(message.SenderId, string.Empty),
                 ReceiverId = message.ReceiverId,
                 PersonalChatId = message.PersonalChatId,
                 GroupChatId = message.GroupChatId,

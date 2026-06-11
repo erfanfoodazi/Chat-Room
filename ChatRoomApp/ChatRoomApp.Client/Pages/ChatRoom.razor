@@ -3,7 +3,11 @@
 @layout ClientLayout
 @rendermode InteractiveWebAssembly
 @using System.Security.Claims
+@using ChatRoomApp.Client.Models
+@using Microsoft.JSInterop
+@implements IDisposable
 @inject ChatApiClient Api
+@inject IJSRuntime JS
 @inject ChatHubClientService ChatHub
 @inject NavigationManager Nav
 @inject AuthenticationStateProvider Auth
@@ -86,6 +90,7 @@
     private bool isLoading = true;
     private bool isGroupChat;
     private int currentUserId;
+    private int otherUserId;
     private ElementReference messagesContainer;
 
     protected override async Task OnInitializedAsync()
@@ -96,6 +101,12 @@
         isGroupChat = uri.AbsolutePath.StartsWith("/app/chat/group", StringComparison.OrdinalIgnoreCase);
         await LoadChat();
         await ConnectToHub();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await ScrollToBottom();
     }
 
     private async Task GetCurrentUserId()
@@ -123,8 +134,8 @@
             {
                 var chat = await Api.GetPersonalChatAsync(ChatId);
                 if (chat is null) { Nav.NavigateTo("/app/chat"); return; }
-                var otherId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
-                var user = await Api.GetUserByIdAsync(otherId);
+                otherUserId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
+                var user = await Api.GetUserByIdAsync(otherUserId);
                 chatName = user?.FullName ?? user?.UserName ?? "Unknown";
                 statusText = user?.IsOnline == true ? "Online" : "Offline";
                 messages = chat.Messages.OrderBy(m => m.SentTime).ToList();
@@ -146,24 +157,77 @@
 
         ChatHub.OnPersonalMessageReceived += OnPersonalMessage;
         ChatHub.OnGroupMessageReceived += OnGroupMessage;
+        ChatHub.OnUserConnected += OnUserConnectedEvent;
+        ChatHub.OnUserDisconnected += OnUserDisconnectedEvent;
+        ChatHub.OnMessageSeen += OnMessageSeenEvent;
+        ChatHub.OnMessageDelivered += OnMessageDeliveredEvent;
+        ChatHub.OnReconnected += OnReconnectedEvent;
     }
 
     private void OnPersonalMessage(MessageDto msg)
     {
-        if (!isGroupChat && (msg.PersonalChatId == ChatId || msg.SenderId != currentUserId))
+        if (!isGroupChat && msg.PersonalChatId == ChatId && msg.SenderId != currentUserId)
         {
             messages.Add(msg);
-            StateHasChanged();
+            _ = InvokeAsync(StateHasChanged);
+            _ = InvokeAsync(ScrollToBottom);
+            _ = MarkMessageDelivered(msg.Id);
         }
     }
 
     private void OnGroupMessage(MessageDto msg)
     {
-        if (isGroupChat && msg.GroupChatId == ChatId)
+        if (isGroupChat && msg.GroupChatId == ChatId && msg.SenderId != currentUserId)
         {
             messages.Add(msg);
-            StateHasChanged();
+            _ = InvokeAsync(StateHasChanged);
+            _ = InvokeAsync(ScrollToBottom);
+            _ = MarkMessageDelivered(msg.Id);
         }
+    }
+
+    private void OnUserConnectedEvent(int userId)
+    {
+        if (!isGroupChat && userId == otherUserId)
+        {
+            statusText = "Online";
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void OnUserDisconnectedEvent(int userId)
+    {
+        if (!isGroupChat && userId == otherUserId)
+        {
+            statusText = "Offline";
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void OnMessageSeenEvent(int messageId)
+    {
+        var msg = messages.FirstOrDefault(m => m.Id == messageId);
+        if (msg is not null)
+        {
+            msg.IsSeen = true;
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void OnMessageDeliveredEvent(int messageId)
+    {
+        var msg = messages.FirstOrDefault(m => m.Id == messageId);
+        if (msg is not null && !msg.IsSeen)
+        {
+            msg.IsDelivered = true;
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnReconnectedEvent()
+    {
+        if (isGroupChat)
+            await ChatHub.JoinGroup(ChatId);
     }
 
     private async Task SendMessage()
@@ -181,16 +245,18 @@
             }
             else
             {
-                var chat = await Api.GetPersonalChatAsync(ChatId);
-                if (chat is null) return;
-                var receiverId = chat.UserOneId == currentUserId ? chat.UserTwoId : chat.UserOneId;
-                await ChatHub.SendPersonalMessage(receiverId, text);
+                await ChatHub.SendPersonalMessage(otherUserId, text);
             }
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Send failed: {ex.Message}");
         }
+    }
+
+    private async Task MarkMessageDelivered(int messageId)
+    {
+        try { await ChatHub.MarkMessageDelivered(messageId); } catch { }
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -201,7 +267,30 @@
         }
     }
 
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", "document.querySelector('.messages-area')?.scrollTo(0, document.querySelector('.messages-area')?.scrollHeight)");
+        }
+        catch { }
+    }
+
     private void GoBack() => Nav.NavigateTo("/app/chat");
+
+    public void Dispose()
+    {
+        ChatHub.OnPersonalMessageReceived -= OnPersonalMessage;
+        ChatHub.OnGroupMessageReceived -= OnGroupMessage;
+        ChatHub.OnUserConnected -= OnUserConnectedEvent;
+        ChatHub.OnUserDisconnected -= OnUserDisconnectedEvent;
+        ChatHub.OnMessageSeen -= OnMessageSeenEvent;
+        ChatHub.OnMessageDelivered -= OnMessageDeliveredEvent;
+        ChatHub.OnReconnected -= OnReconnectedEvent;
+
+        if (isGroupChat)
+            _ = ChatHub.LeaveGroup(ChatId);
+    }
 }
 
 <style>

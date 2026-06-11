@@ -2,7 +2,9 @@
 @layout ClientLayout
 @rendermode InteractiveWebAssembly
 @using System.Security.Claims
+@implements IDisposable
 @inject ChatApiClient Api
+@inject ChatHubClientService ChatHub
 @inject NavigationManager Nav
 @inject AuthenticationStateProvider Auth
 
@@ -91,6 +93,36 @@
         await GetCurrentUserId();
         if (currentUserId == 0) { Nav.NavigateTo("/account/login", true); return; }
         await LoadChats();
+        await ConnectToHub();
+    }
+
+    private async Task ConnectToHub()
+    {
+        if (!ChatHub.IsConnected)
+            await ChatHub.StartAsync();
+
+        ChatHub.OnUserConnected += HandleUserConnected;
+        ChatHub.OnUserDisconnected += HandleUserDisconnected;
+    }
+
+    private void HandleUserConnected(int userId)
+    {
+        var chat = chats.FirstOrDefault(c => c.ChatType == "personal" && c.OtherUserId == userId);
+        if (chat is not null)
+        {
+            chat.IsOnline = true;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleUserDisconnected(int userId)
+    {
+        var chat = chats.FirstOrDefault(c => c.ChatType == "personal" && c.OtherUserId == userId);
+        if (chat is not null)
+        {
+            chat.IsOnline = false;
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task GetCurrentUserId()
@@ -163,6 +195,12 @@
     private void SetFilterGroup() { filter = "group"; StateHasChanged(); }
 
     private void GoToNewChat() => Nav.NavigateTo("/app/chat/new");
+
+    public void Dispose()
+    {
+        ChatHub.OnUserConnected -= HandleUserConnected;
+        ChatHub.OnUserDisconnected -= HandleUserDisconnected;
+    }
 
     private static string FormatTime(DateTime time)
     {
