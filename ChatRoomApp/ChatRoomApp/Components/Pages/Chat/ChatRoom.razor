@@ -21,6 +21,7 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JS
+@inject UserStatusBroadcastService StatusBroadcast
 
 <div class="chat-room d-flex flex-column">
     <div class="chat-header d-flex align-items-center gap-3 px-4 py-3">
@@ -129,6 +130,7 @@
 
         BroadcastService.OnPersonalMessageReceived += HandlePersonalMessage;
         BroadcastService.OnGroupMessageReceived += HandleGroupMessage;
+        StatusBroadcast.OnUserStatusChanged += HandleUserStatusChanged;
 
         await LoadChat();
     }
@@ -220,6 +222,7 @@
                     messages.Add(msg);
                     await HubContext.Clients.Group(ChatId.ToString())
                         .SendAsync("ReceiveGroupMessage", msg);
+                    BroadcastService.NotifyGroupMessage(msg);
                     StateHasChanged();
                 }
             }
@@ -238,6 +241,7 @@
                     messages.Add(msg);
                     await HubContext.Clients.User(otherUserId.ToString())
                         .SendAsync("ReceivePersonalMessage", msg);
+                    BroadcastService.NotifyPersonalMessage(msg);
                     StateHasChanged();
                 }
             }
@@ -273,6 +277,15 @@
             messages.Add(msg);
             InvokeAsync(StateHasChanged);
             InvokeAsync(ScrollToBottom);
+        }
+    }
+
+    private void HandleUserStatusChanged(int userId, bool isOnline)
+    {
+        if (!isGroupChat && userId == otherUserId)
+        {
+            statusText = isOnline ? "Online" : "Offline";
+            InvokeAsync(StateHasChanged);
         }
     }
 
@@ -324,6 +337,7 @@
     {
         BroadcastService.OnPersonalMessageReceived -= HandlePersonalMessage;
         BroadcastService.OnGroupMessageReceived -= HandleGroupMessage;
+        StatusBroadcast.OnUserStatusChanged -= HandleUserStatusChanged;
     }
 }
 

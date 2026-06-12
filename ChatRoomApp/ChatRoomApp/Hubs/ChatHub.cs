@@ -16,12 +16,16 @@ public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
     private readonly MessageBroadcastService _broadcastService;
+    private readonly UserStatusBroadcastService _statusBroadcastService;
+    private readonly ConnectionTracker _connectionTracker;
     private readonly IPersonalChatRepository _personalChatRepository;
 
-    public ChatHub(IMediator mediator, MessageBroadcastService broadcastService, IPersonalChatRepository personalChatRepository)
+    public ChatHub(IMediator mediator, MessageBroadcastService broadcastService, UserStatusBroadcastService statusBroadcastService, ConnectionTracker connectionTracker, IPersonalChatRepository personalChatRepository)
     {
         _mediator = mediator;
         _broadcastService = broadcastService;
+        _statusBroadcastService = statusBroadcastService;
+        _connectionTracker = connectionTracker;
         _personalChatRepository = personalChatRepository;
     }
 
@@ -31,8 +35,13 @@ public class ChatHub : Hub
         var userId = GetUserId();
         if (userId != 0)
         {
-            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = true });
-            await Clients.Others.SendAsync("UserConnected", userId);
+            var count = _connectionTracker.AddConnection(userId, Context.ConnectionId);
+            if (count == 1)
+            {
+                await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = true });
+                await Clients.Others.SendAsync("UserConnected", userId);
+                _statusBroadcastService.NotifyStatusChanged(userId, true);
+            }
         }
         await base.OnConnectedAsync();
     }
@@ -42,8 +51,13 @@ public class ChatHub : Hub
         var userId = GetUserId();
         if (userId != 0)
         {
-            await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = false });
-            await Clients.Others.SendAsync("UserDisconnected", userId);
+            var count = _connectionTracker.RemoveConnection(userId, Context.ConnectionId);
+            if (count == 0)
+            {
+                await _mediator.Send(new SetOnlineOrOfflineCommand { UserId = userId, IsOnline = false });
+                await Clients.Others.SendAsync("UserDisconnected", userId);
+                _statusBroadcastService.NotifyStatusChanged(userId, false);
+            }
         }
         await base.OnDisconnectedAsync(exception);
     }

@@ -166,23 +166,33 @@
 
     private void OnPersonalMessage(MessageDto msg)
     {
-        if (!isGroupChat && msg.PersonalChatId == ChatId && msg.SenderId != currentUserId)
+        if (!isGroupChat && msg.PersonalChatId == ChatId)
         {
-            messages.Add(msg);
-            _ = InvokeAsync(StateHasChanged);
-            _ = InvokeAsync(ScrollToBottom);
-            _ = MarkMessageDelivered(msg.Id);
+            var existing = messages.FirstOrDefault(m => m.Id == msg.Id);
+            if (existing is null)
+            {
+                messages.Add(msg);
+                _ = InvokeAsync(StateHasChanged);
+                _ = InvokeAsync(ScrollToBottom);
+            }
+            if (msg.SenderId != currentUserId)
+                _ = MarkMessageDelivered(msg.Id);
         }
     }
 
     private void OnGroupMessage(MessageDto msg)
     {
-        if (isGroupChat && msg.GroupChatId == ChatId && msg.SenderId != currentUserId)
+        if (isGroupChat && msg.GroupChatId == ChatId)
         {
-            messages.Add(msg);
-            _ = InvokeAsync(StateHasChanged);
-            _ = InvokeAsync(ScrollToBottom);
-            _ = MarkMessageDelivered(msg.Id);
+            var existing = messages.FirstOrDefault(m => m.Id == msg.Id);
+            if (existing is null)
+            {
+                messages.Add(msg);
+                _ = InvokeAsync(StateHasChanged);
+                _ = InvokeAsync(ScrollToBottom);
+            }
+            if (msg.SenderId != currentUserId)
+                _ = MarkMessageDelivered(msg.Id);
         }
     }
 

@@ -11,10 +11,12 @@ namespace ChatRoomApp.ViewModels.Chat
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int UserId { get; set; }
+        public int OtherUserId { get; set; }
         public string UserReceiverName { get; set; } = string.Empty;
         public string LastMessageText { get; set; } = string.Empty;
         public DateTime LastMessageTime { get; set; }
-        public string ChatType { get; set; } = string.Empty; 
+        public string ChatType { get; set; } = string.Empty;
+        public bool IsOnline { get; set; }
 
         public ChatListViewModel()
         {
@@ -47,8 +49,10 @@ namespace ChatRoomApp.ViewModels.Chat
                 var user = await mediator.Send(userQuery);
 
                 chatViewModel.Name = user?.UserName ?? "Unknown User";
+                chatViewModel.OtherUserId = otherUserId;
                 chatViewModel.UserReceiverName = user?.UserName ?? string.Empty;
                 chatViewModel.Description = $"Chat with {chatViewModel.Name}";
+                chatViewModel.IsOnline = user?.IsOnline ?? false;
                 result.Add(chatViewModel);
             }
 
@@ -104,9 +108,11 @@ namespace ChatRoomApp.ViewModels.Chat
                 var user = await mediator.Send(userQuery);
 
                 chatViewModel.Name = user?.UserName ?? "Unknown User";
+                chatViewModel.OtherUserId = otherUserId;
                 chatViewModel.UserReceiverName = user?.UserName ?? string.Empty;
                 chatViewModel.Description = $"Chat with {chatViewModel.Name}";
-                
+                chatViewModel.IsOnline = user?.IsOnline ?? false;
+
                 result.Add(chatViewModel);
             }
 

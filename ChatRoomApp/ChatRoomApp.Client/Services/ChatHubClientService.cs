@@ -35,7 +35,13 @@ public class ChatHubClientService : IAsyncDisposable
         await _semaphore.WaitAsync();
         try
         {
-            if (_hubConnection != null) return;
+            if (_hubConnection is not null && _hubConnection.State != HubConnectionState.Disconnected) return;
+
+            if (_hubConnection is not null)
+            {
+                await _hubConnection.DisposeAsync();
+                _hubConnection = null;
+            }
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(_navigation.ToAbsoluteUri("/chathub"))
