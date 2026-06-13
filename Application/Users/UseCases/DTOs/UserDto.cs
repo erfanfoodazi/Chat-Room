@@ -18,6 +18,7 @@ namespace Application.Users.UseCases.DTOs
         public bool IsOnline { get; set; }
         public DateTime LastSeen { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int Role {  get; set; }
         public virtual ICollection<PersonalChat> PersonalChats { get; set; } = new List<PersonalChat>();
         public virtual ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
     }

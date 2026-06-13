@@ -1,6 +1,8 @@
 ﻿@page "/chat/group"
 @rendermode InteractiveServer
+@using Application.Users.UseCases.Queries
 @using ChatRoomApp.ViewModels.Chat
+@using Application.GroupChats.UseCases.Commands
 @using MediatR
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
@@ -55,15 +57,66 @@ else
     </div>
 }
 
-<button class="fab-new-chat" title="New Chat" @onclick="StartNewChat" type="button">
+<button class="fab-new-chat" title="New Chat" @onclick="ShowCreateModal" type="button">
     <i class="fas fa-plus"></i>
 </button>
+
+@if (showCreateModal)
+{
+    <div class="group-modal-overlay" @onclick="CloseCreateModal">
+        <div class="group-modal-box" @onclick:stopPropagation="true">
+            <div class="group-modal-head">
+                <h5 class="group-modal-title"><i class="fas fa-users me-2"></i>Create New Group</h5>
+                <button type="button" class="btn-close" @onclick="CloseCreateModal"></button>
+            </div>
+            <div class="group-modal-body">
+                <div class="mb-3">
+                    <label for="groupName" class="form-label">Group Name <span class="text-danger">*</span></label>
+                    <input id="groupName" type="text" class="form-control" placeholder="Enter group name..."
+                           @bind="newGroupName" @bind:event="oninput" />
+                </div>
+                <div class="mb-3">
+                    <label for="groupDescription" class="form-label">Description</label>
+                    <textarea id="groupDescription" class="form-control" rows="3"
+                              placeholder="Optional description..." @bind="newGroupDescription"></textarea>
+                </div>
+                <div class="mb-3 form-check form-switch">
+                    <input id="isPublic" class="form-check-input" type="checkbox" @bind="newGroupIsPublic" />
+                    <label for="isPublic" class="form-check-label">Public group</label>
+                </div>
+                @if (!string.IsNullOrEmpty(createError))
+                {
+                    <div class="alert alert-danger py-2">@createError</div>
+                }
+            </div>
+            <div class="group-modal-foot">
+                <button type="button" class="btn btn-secondary" @onclick="CloseCreateModal">Cancel</button>
+                <button type="button" class="btn btn-success" @onclick="CreateGroup" disabled="@(string.IsNullOrWhiteSpace(newGroupName) || isCreating)">
+                    @if (isCreating)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    <i class="fas fa-plus me-1"></i>Create
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
 
     List<ChatListViewModel> chats = new List<ChatListViewModel>();
     bool isLoading = true;
     private int currentUserId = 0;
+    int userRole = 0;
+
+
+    bool showCreateModal = false;
+    string newGroupName = string.Empty;
+    string newGroupDescription = string.Empty;
+    bool newGroupIsPublic = true;
+    bool isCreating = false;
+    string createError = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,14 +157,59 @@ else
 
     private void OpenChat(ChatListViewModel chat)
     {
-            Navigation.NavigateTo($"/chat/group/{chat.Id}");
+        Navigation.NavigateTo($"/chat/group/{chat.Id}");
     }
 
-    private void StartNewChat()
+    private void ShowCreateModal()
     {
+        newGroupName = string.Empty;
+        newGroupDescription = string.Empty;
+        newGroupIsPublic = true;
+        createError = string.Empty;
+        showCreateModal = true;
+    }
 
-        Console.WriteLine("go to new chat page");
-        Navigation.NavigateTo("/chat/new");
+    private void CloseCreateModal()
+    {
+        showCreateModal = false;
+    }
+
+    private async Task CreateGroup()
+    {
+        if (string.IsNullOrWhiteSpace(newGroupName)) return;
+
+        isCreating = true;
+        createError = string.Empty;
+
+        try
+        {
+            var command = new CreateGroupChatCommand
+            {
+                Name = newGroupName.Trim(),
+                Description = string.IsNullOrWhiteSpace(newGroupDescription) ? null : newGroupDescription.Trim(),
+                OwnerId = currentUserId,
+                IsPublic = newGroupIsPublic,
+            };
+
+            var group = await Mediator.Send(command);
+            if (group is not null)
+            {
+                showCreateModal = false;
+                Navigation.NavigateTo($"/chat/group/{group.Id}");
+            }
+            else
+            {
+                createError = "Failed to create group.";
+            }
+        }
+        catch (Exception ex)
+        {
+            createError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isCreating = false;
+        }
     }
 
     private string FormatTime(DateTime time)
@@ -130,6 +228,7 @@ else
 
         return time.ToString("MMM dd");
     }
+
 }
 
 <style>
@@ -237,6 +336,69 @@ else
         .fab-new-chat:active {
             transform: scale(0.95);
         }
+
+    /* Modal */
+    .group-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .group-modal-box {
+        background: #fff;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 480px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        overflow: hidden;
+        pointer-events: auto;
+    }
+
+    .group-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .group-modal-title {
+        margin: 0;
+        font-size: 1.15rem;
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        opacity: 0.5;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .btn-close:hover {
+        opacity: 0.75;
+    }
+
+    .group-modal-body {
+        padding: 1.25rem;
+    }
+
+    .group-modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #dee2e6;
+    }
 
     /* Mobile responsive */
     @@media (max-width: 768px) {

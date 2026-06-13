@@ -32,6 +32,12 @@
             <h5 class="m-0">@chatName</h5>
             <small class="text-secondary">@statusText</small>
         </div>
+        @if (isGroupChat)
+        {
+            <button class="btn btn-sm btn-outline-light" @onclick="ShowAddMemberModal" title="Add Member">
+                <i class="fas fa-user-plus"></i>
+            </button>
+        }
     </div>
 
     <div class="messages-area flex-grow-1 px-4 py-3" @ref="messagesContainer">
@@ -58,7 +64,7 @@
                 <div class="message @(isMine ? "mine" : "theirs")">
                     @if (!isMine && isGroupChat)
                     {
-                        <small class="sender-name">@GetSenderName(msg.SenderId)</small>
+                        <small class="sender-name">@msg.SenderName</small>
                     }
                     <div class="bubble @(isMine ? "bubble-mine" : "bubble-theirs")">
                         @if (msg.ReplyToMessageId.HasValue)
@@ -105,6 +111,83 @@
     </div>
 </div>
 
+@if (showAddMemberModal)
+{
+    <div class="grp-modal-overlay" @onclick="CloseAddMemberModal">
+        <div class="grp-modal-box" @onclick:stopPropagation="true">
+            <div class="grp-modal-head">
+                <h5 class="grp-modal-title"><i class="fas fa-user-plus me-2"></i>Add Member</h5>
+                <button type="button" class="btn-close" @onclick="CloseAddMemberModal">×</button>
+            </div>
+            <div class="grp-modal-body">
+                <div class="mb-3">
+                    <label for="memberSearch" class="form-label">Search by username or email</label>
+                    <div class="input-group">
+                        <input id="memberSearch" type="text" class="form-control"
+                               placeholder="Type to search..."
+                               @bind="memberSearchQuery" @bind:event="oninput" />
+                        <button class="btn btn-primary" @onclick="SearchMember"
+                                disabled="@(string.IsNullOrWhiteSpace(memberSearchQuery) || isSearchingMember)">
+                            @if (isSearchingMember)
+                            {
+                                <span class="spinner-border spinner-border-sm"></span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-search"></i>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(memberSearchError))
+                {
+                    <div class="alert alert-danger py-2">@memberSearchError</div>
+                }
+
+                @if (foundMember is not null)
+                {
+                    <div class="user-card">
+                        <div class="user-avatar">@(foundMember.FullName.Length > 0 ? foundMember.FullName[0].ToString().ToUpper() : "?")</div>
+                        <div class="user-info">
+                            <strong>@foundMember.FullName</strong>
+                            <small class="text-secondary">@@@foundMember.UserName</small>
+                        </div>
+                        @if (isAddingMember)
+                        {
+                            <span class="spinner-border spinner-border-sm text-success"></span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-success" @onclick="() => AddMember(foundMember.Id)">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        }
+                    </div>
+                }
+
+                @if (hasSearchedMember && foundMember is null && string.IsNullOrEmpty(memberSearchError))
+                {
+                    <div class="empty-state text-center py-3">
+                        <i class="fas fa-user-slash fa-2x text-secondary mb-2"></i>
+                        <p class="text-secondary mb-0">No user found.</p>
+                    </div>
+                }
+
+                @if (memberAddedMessage != null)
+                {
+                    <div class="alert alert-@(memberAddedMessage.IsSuccess ? "success" : "danger") py-2 mt-2">
+                        @memberAddedMessage.Text
+                    </div>
+                }
+            </div>
+            <div class="grp-modal-foot">
+                <button type="button" class="btn btn-secondary" @onclick="CloseAddMemberModal">Close</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter] public int ChatId { get; set; }
 
@@ -119,6 +202,21 @@
     private int otherUserId;
     private Dictionary<int, string> senderNames = new();
     private ElementReference messagesContainer;
+
+    private bool showAddMemberModal;
+    private string memberSearchQuery = string.Empty;
+    private bool isSearchingMember;
+    private bool hasSearchedMember;
+    private string memberSearchError = string.Empty;
+    private UserDto? foundMember;
+    private bool isAddingMember;
+    private MemberAddedMessage? memberAddedMessage;
+
+    private class MemberAddedMessage
+    {
+        public string Text { get; set; } = string.Empty;
+        public bool IsSuccess { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -258,7 +356,7 @@
 
     private void HandlePersonalMessage(MessageDto msg)
     {
-        if (!isGroupChat && msg.PersonalChatId == ChatId)
+        if (!isGroupChat && msg.PersonalChatId == ChatId && msg.SenderId != currentUserId)
         {
             messages.Add(msg);
             InvokeAsync(StateHasChanged);
@@ -268,7 +366,7 @@
 
     private void HandleGroupMessage(MessageDto msg)
     {
-        if (isGroupChat && msg.GroupChatId == ChatId)
+        if (isGroupChat && msg.GroupChatId == ChatId && msg.SenderId != currentUserId)
         {
             if (!senderNames.ContainsKey(msg.SenderId))
             {
@@ -331,6 +429,103 @@
             Navigation.NavigateTo("/chat/group");
         else
             Navigation.NavigateTo("/chat/personal");
+    }
+
+    private void ShowAddMemberModal()
+    {
+        memberSearchQuery = string.Empty;
+        memberSearchError = string.Empty;
+        foundMember = null;
+        hasSearchedMember = false;
+        memberAddedMessage = null;
+        isAddingMember = false;
+        showAddMemberModal = true;
+    }
+
+    private void CloseAddMemberModal()
+    {
+        showAddMemberModal = false;
+    }
+
+    private async Task SearchMember()
+    {
+        if (string.IsNullOrWhiteSpace(memberSearchQuery)) return;
+
+        isSearchingMember = true;
+        memberSearchError = string.Empty;
+        foundMember = null;
+        hasSearchedMember = true;
+        memberAddedMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            foundMember = await Mediator.Send(new GetUserByEmailQuery { Email = memberSearchQuery.Trim() })
+                        ?? await Mediator.Send(new GetUserByUserNameQuery { UserName = memberSearchQuery.Trim() });
+
+            if (foundMember?.Id == currentUserId)
+            {
+                memberSearchError = "You cannot add yourself.";
+                foundMember = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            memberSearchError = $"Search failed: {ex.Message}";
+        }
+        finally
+        {
+            isSearchingMember = false;
+        }
+    }
+
+    private async Task AddMember(int userId)
+    {
+        if (isAddingMember) return;
+        isAddingMember = true;
+        memberAddedMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var success = await Mediator.Send(new AddUserToGroupCommand
+            {
+                GroupId = ChatId,
+                UserId = userId,
+            });
+
+            if (success)
+            {
+                memberAddedMessage = new MemberAddedMessage
+                {
+                    Text = "Member added successfully!",
+                    IsSuccess = true,
+                };
+                foundMember = null;
+                memberSearchQuery = string.Empty;
+                statusText = $"{int.Parse(statusText.Split(' ')[0]) + 1} members";
+            }
+            else
+            {
+                memberAddedMessage = new MemberAddedMessage
+                {
+                    Text = "User is already a member or not found.",
+                    IsSuccess = false,
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            memberAddedMessage = new MemberAddedMessage
+            {
+                Text = $"Error: {ex.Message}",
+                IsSuccess = false,
+            };
+        }
+        finally
+        {
+            isAddingMember = false;
+        }
     }
 
     public void Dispose()
@@ -481,6 +676,88 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+    }
+
+    /* Add Member Modal */
+    .grp-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .grp-modal-box {
+        background: #fff;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 440px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        overflow: hidden;
+        pointer-events: auto;
+    }
+
+    .grp-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .grp-modal-title {
+        margin: 0;
+        font-size: 1.15rem;
+        color: #212529;
+    }
+
+    .grp-modal-body {
+        padding: 1.25rem;
+    }
+
+    .grp-modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .user-card {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+    }
+
+    .user-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        flex: 1;
+        color: #212529;
+    }
+
+    .user-info strong {
+        display: block;
     }
 
     @@media (max-width: 768px) {
