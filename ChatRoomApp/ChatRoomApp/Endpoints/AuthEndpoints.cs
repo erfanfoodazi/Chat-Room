@@ -96,24 +96,16 @@ public static class AuthEndpoints
 
     private static async Task<IResult> GetCurrentUserAsync(
         HttpContext httpContext,
-        UserManager<User> userManager)
+        IMediator mediator)
     {
         var userId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (userId is null)
             return Results.Unauthorized();
 
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await mediator.Send(new GetUserByIdQuery { UserId = int.Parse(userId) });
         if (user is null)
             return Results.NotFound();
 
-        return Results.Ok(new
-        {
-            user.Id,
-            user.UserName,
-            user.Email,
-            user.FullName,
-            user.IsOnline,
-            user.LastSeen,
-        });
+        return Results.Ok(user);
     }
 }

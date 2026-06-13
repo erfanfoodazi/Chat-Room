@@ -130,6 +130,7 @@ namespace Infrastructure.Repositories
             existingUser.Email = user.Email;
             existingUser.PhoneNumber = user.PhoneNumber;
             existingUser.ProfilePictureUrl = user.ProfilePictureUrl;
+            existingUser.Bio = user.Bio;
 
             var result = await _userManager.UpdateAsync(existingUser);
             return result.Succeeded;

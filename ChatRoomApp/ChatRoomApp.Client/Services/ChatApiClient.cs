@@ -64,6 +64,19 @@ public class ChatApiClient
         }
     }
 
+    public async Task<bool> UpdateUserAsync(UserDto user)
+    {
+        try
+        {
+            var response = await _http.PutAsJsonAsync("/api/users/update", user);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     // ─── Personal Chats ──────────────────────────────────────
     public async Task<List<PersonalChatDto>> GetPersonalChatsAsync(int userId)
     {

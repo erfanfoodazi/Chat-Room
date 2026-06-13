@@ -1,0 +1,239 @@
+@page "/app/profile"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using Application.Users.UseCases.DTOs
+@using Application.Users.UseCases.Queries
+@using Application.Users.UseCases.Commands
+@using MediatR
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IMediator Mediator
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider Auth
+
+<div class="profile-page">
+    <div class="page-header">
+        <h4><i class="fas fa-user me-2"></i>My Profile</h4>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else if (user is not null)
+    {
+        @if (isEditing)
+        {
+            <div class="profile-card">
+                <div class="avatar-large">@(editFullName.Length > 0 ? editFullName[0].ToString().ToUpper() : "?")</div>
+
+                @if (!string.IsNullOrEmpty(saveMessage))
+                {
+                    <div class="alert @(saveSuccess ? "alert-success" : "alert-danger") mt-3">
+                        @saveMessage
+                    </div>
+                }
+
+                <div class="edit-form mt-4">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input class="form-control" @bind="editFullName" placeholder="Enter your full name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" @bind="editUserName" placeholder="Choose a username" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" @bind="editEmail" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-control" @bind="editBio" placeholder="Tell us about yourself" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-primary flex-fill" @onclick="SaveProfile" disabled="@isSaving">
+                            @if (isSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                            }
+                            Save Changes
+                        </button>
+                        <button class="btn btn-outline-secondary" @onclick="CancelEdit">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="profile-card">
+                <div class="avatar-large">@(user.FullName.Length > 0 ? user.FullName[0].ToString().ToUpper() : "?")</div>
+                <h4 class="mt-3 mb-1">@user.FullName</h4>
+                <p class="text-secondary">@@@user.UserName</p>
+
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">@user.Email</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Bio</span>
+                        <span class="info-value">@(string.IsNullOrEmpty(user.Bio) ? "No bio yet" : user.Bio)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Joined</span>
+                        <span class="info-value">@user.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary mt-4 w-100" @onclick="StartEditing">
+                    <i class="fas fa-edit me-1"></i> Edit Profile
+                </button>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private UserDto? user;
+    private bool isLoading = true;
+    private bool isEditing;
+    private bool isSaving;
+    private string? saveMessage;
+    private bool saveSuccess;
+
+    private string editFullName = "";
+    private string editUserName = "";
+    private string editEmail = "";
+    private string editBio = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var state = await Auth.GetAuthenticationStateAsync();
+            if (!state.User.Identity?.IsAuthenticated ?? true)
+            {
+                Nav.NavigateTo("/account/login", true);
+                return;
+            }
+
+            var userId = state.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+            {
+                Nav.NavigateTo("/account/login", true);
+                return;
+            }
+
+            user = await Mediator.Send(new GetUserByIdQuery { UserId = int.Parse(userId) });
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void StartEditing()
+    {
+        if (user is null) return;
+        editFullName = user.FullName;
+        editUserName = user.UserName;
+        editEmail = user.Email;
+        editBio = user.Bio;
+        saveMessage = null;
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+        saveMessage = null;
+    }
+
+    private async Task SaveProfile()
+    {
+        if (string.IsNullOrWhiteSpace(editFullName) || string.IsNullOrWhiteSpace(editUserName))
+        {
+            saveMessage = "Full name and username are required.";
+            saveSuccess = false;
+            return;
+        }
+
+        isSaving = true;
+        saveMessage = null;
+
+        try
+        {
+            if (user is null) return;
+
+            var result = await Mediator.Send(new UpdateUserCommand
+            {
+                Id = user.Id,
+                FullName = editFullName.Trim(),
+                UserName = editUserName.Trim(),
+                Email = user.Email,
+                Bio = editBio.Trim(),
+                ProfilePictureUrl = user.ProfilePictureUrl,
+            });
+
+            if (result)
+            {
+                saveMessage = "Profile updated successfully!";
+                saveSuccess = true;
+                isEditing = false;
+                user = await Mediator.Send(new GetUserByIdQuery { UserId = user.Id });
+            }
+            else
+            {
+                saveMessage = "Failed to update profile. Try again.";
+                saveSuccess = false;
+            }
+        }
+        catch
+        {
+            saveMessage = "An error occurred.";
+            saveSuccess = false;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}
+
+<style>
+    .profile-page { padding: 2rem 1.5rem; max-width: 500px; margin: 0 auto; width: 100%; }
+    .page-header { margin-bottom: 2rem; }
+    .page-header h4 { color: #fff; margin: 0; }
+    .profile-card { text-align: center; }
+    .avatar-large {
+        width: 96px; height: 96px; border-radius: 50%; margin: 0 auto;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 2.5rem; font-weight: 700;
+    }
+    .info-list { margin-top: 2rem; text-align: left; }
+    .info-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .info-label { color: #6c757d; font-size: 0.875rem; }
+    .info-value { color: #e0e0e0; font-weight: 500; }
+    .edit-form { text-align: left; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { color: #adb5bd; font-size: 0.875rem; margin-bottom: 0.375rem; display: block; }
+    .form-control {
+        width: 100%; padding: 0.625rem 0.875rem;
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px; color: #e0e0e0; font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+    .form-control:focus { outline: none; border-color: #0d6efd; background: rgba(255,255,255,0.08); }
+    .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; }
+    .alert-success { background: rgba(25,135,84,0.15); color: #75b798; border: 1px solid rgba(25,135,84,0.3); }
+    .alert-danger { background: rgba(220,53,69,0.15); color: #ea868f; border: 1px solid rgba(220,53,69,0.3); }
+</style>
