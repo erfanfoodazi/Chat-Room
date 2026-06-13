@@ -13,6 +13,7 @@ namespace Application.GroupChats.UseCases.Commands
     {
         public int GroupId { get; set; }
         public int UserId { get; set; }
+        public int RequestedByUserId { get; set; }
     }
 
     public class AddUserToGroupCommandHandler : IRequestHandler<AddUserToGroupCommand, bool>
@@ -26,6 +27,10 @@ namespace Application.GroupChats.UseCases.Commands
         }
         public async Task<bool> Handle(AddUserToGroupCommand request, CancellationToken cancellationToken)
         {
+            var role = await _groupChatRepository.GetGroupMemberRole(request.GroupId, request.RequestedByUserId);
+            if (role != GroupRole.Owner && role != GroupRole.Admin)
+                return false;
+
             var group = await _groupChatRepository.GetGroupChatByGroupId(request.GroupId);
 
             if (group == null) 

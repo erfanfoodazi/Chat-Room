@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Users.UseCases.Commands;
 using ChatRoomApp.Components;
 using ChatRoomApp.Endpoints;
 using ChatRoomApp.Hubs;
@@ -6,6 +7,9 @@ using ChatRoomApp.Services;
 using Domain.Entities;
 using Infrastructure.DataBaseContext;
 using Infrastructure.Repositories;
+using MediatR;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,6 +65,12 @@ builder.Services.AddSignalR(options =>
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<CircuitHandler, ChatRoomApp.Services.UserOnlineCircuitHandler>();
+
+builder.Services.Configure<CircuitOptions>(options =>
+{
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromSeconds(30);
+});
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
@@ -108,6 +118,16 @@ app.MapPost("/account/logout", async (SignInManager<User> signInManager) =>
     await signInManager.SignOutAsync();
     return Results.Redirect("/account/login");
 });
+app.MapPost("/api/users/offline", async (HttpContext httpContext, UserManager<User> userManager, IMediator mediator) =>
+{
+    var user = await userManager.GetUserAsync(httpContext.User);
+    if (user != null)
+    {
+        await mediator.Send(new SetOnlineOrOfflineCommand { UserId = user.Id, IsOnline = false });
+    }
+    return Results.Ok();
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()

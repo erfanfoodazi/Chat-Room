@@ -14,7 +14,9 @@ namespace Application.Interfaces
         Task<GroupChat> CreateGroupChat(GroupChat groupChat, User owner);
         Task<bool> UpdateGroupChat(GroupChat groupChat);
         Task<bool> DeleteGroupChat(int groupId);
-        Task<bool> AddUserToGroupId(int groupId ,User user);
+        Task<bool> AddUserToGroupId(int groupId, User user);
+        Task<bool> RemoveUserFromGroup(int groupId, int userId);
+        Task<GroupRole?> GetGroupMemberRole(int groupId, int userId);
         Task<string> SendMessage(Message message);
     }
 }

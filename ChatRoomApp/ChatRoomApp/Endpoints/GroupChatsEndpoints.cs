@@ -14,6 +14,10 @@ public static class GroupChatsEndpoints
         group.MapGet("/", GetByUserIdAsync);
         group.MapGet("/{groupId:int}", GetByIdAsync);
         group.MapPost("/", CreateAsync);
+        group.MapPut("/{groupId:int}", UpdateAsync);
+        group.MapDelete("/{groupId:int}", DeleteAsync);
+        group.MapPost("/{groupId:int}/members", AddMemberAsync);
+        group.MapDelete("/{groupId:int}/leave", LeaveAsync);
 
         return group;
     }
@@ -41,5 +45,50 @@ public static class GroupChatsEndpoints
         return group is null ? Results.BadRequest() : Results.Ok(group);
     }
 
+    private static async Task<IResult> UpdateAsync(int groupId, UpdateGroupChatRequest request, IMediator mediator)
+    {
+        var success = await mediator.Send(new UpdateGroupChatCommand
+        {
+            GroupId = groupId,
+            Name = request.Name,
+            Description = request.Description ?? string.Empty,
+            RequestedByUserId = request.RequestedByUserId,
+        });
+        return success ? Results.Ok() : Results.Forbid();
+    }
+
+    private static async Task<IResult> DeleteAsync(int groupId, int userId, IMediator mediator)
+    {
+        var success = await mediator.Send(new DeleteGroupChatCommand
+        {
+            GroupId = groupId,
+            RequestedByUserId = userId,
+        });
+        return success ? Results.Ok() : Results.Forbid();
+    }
+
+    private static async Task<IResult> AddMemberAsync(int groupId, AddMemberRequest request, IMediator mediator)
+    {
+        var success = await mediator.Send(new AddUserToGroupCommand
+        {
+            GroupId = groupId,
+            UserId = request.UserId,
+            RequestedByUserId = request.RequestedByUserId,
+        });
+        return success ? Results.Ok() : Results.Forbid();
+    }
+
+    private static async Task<IResult> LeaveAsync(int groupId, int userId, IMediator mediator)
+    {
+        var success = await mediator.Send(new LeaveGroupCommand
+        {
+            GroupId = groupId,
+            UserId = userId,
+        });
+        return success ? Results.Ok() : Results.BadRequest();
+    }
+
     private record CreateGroupChatRequest(string Name, string? Description, int OwnerId);
+    private record UpdateGroupChatRequest(string Name, string? Description, int RequestedByUserId);
+    private record AddMemberRequest(int UserId, int RequestedByUserId);
 }

@@ -81,6 +81,13 @@
 </div>
 
 @code {
+
+
+
+
+
+
+
     [Parameter] public int ChatId { get; set; }
 
     private List<MessageDto> messages = new();
@@ -127,6 +134,7 @@
                 var group = await Api.GetGroupChatAsync(ChatId);
                 if (group is null) { Nav.NavigateTo("/app/chat"); return; }
                 chatName = group.Name;
+
                 statusText = $"{group.Members.Count} members";
                 messages = group.Messages.OrderBy(m => m.SentTime).ToList();
             }

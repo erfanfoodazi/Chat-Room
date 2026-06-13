@@ -11,6 +11,7 @@ namespace Application.GroupChats.UseCases.Commands
     public class DeleteGroupChatCommand : IRequest<bool>
     {
         public int GroupId { get; set; }
+        public int RequestedByUserId { get; set; }
     }
 
     public class DeleteGroupChatCommandHandler : IRequestHandler<DeleteGroupChatCommand, bool>
@@ -22,6 +23,10 @@ namespace Application.GroupChats.UseCases.Commands
         }
         public async Task<bool> Handle(DeleteGroupChatCommand request, CancellationToken cancellationToken)
         {
+            var role = await _groupChatRepository.GetGroupMemberRole(request.GroupId, request.RequestedByUserId);
+            if (role != GroupRole.Owner)
+                return false;
+
             return await _groupChatRepository.DeleteGroupChat(request.GroupId);
         }
     }

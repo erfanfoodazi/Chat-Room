@@ -13,6 +13,7 @@ namespace Application.Messages.UseCases.Commands
     {
         public int MessageId { get; set; }
         public string Text { get; set; } = string.Empty;
+        public int SenderId { get; set; }
     }
 
     public class UpdateMessageCommandHandler : IRequestHandler<UpdateMessageCommand, MessageDto>
@@ -26,6 +27,9 @@ namespace Application.Messages.UseCases.Commands
         {
             var oldMessage = await _messageRepository.GetMessageByIdAsync(request.MessageId);
             if (oldMessage == null)
+                return null;
+
+            if (oldMessage.SenderId != request.SenderId)
                 return null;
 
             oldMessage.Text = request.Text;

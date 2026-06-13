@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Messages.UseCases.Commands;
 using Application.Messages.UseCases.Dto;
+using Application.Messages.UseCases.Queries;
 using Application.PersonalChats.UseCases.Commands;
 using Application.Users.UseCases.Commands;
 using ChatRoomApp.Services;
@@ -122,6 +123,65 @@ public class ChatHub : Hub
 
         // Notify server-side Blazor components
         _broadcastService.NotifyGroupMessage(message);
+    }
+
+    // ─── Edit / Delete Messages ──────────────────────────────
+    public async Task EditMessage(int messageId, string text)
+    {
+        var senderId = GetUserId();
+        if (senderId == 0) return;
+
+        var message = await _mediator.Send(new UpdateMessageCommand
+        {
+            MessageId = messageId,
+            Text = text,
+            SenderId = senderId,
+        });
+
+        if (message == null) return;
+
+        if (message.GroupChatId.HasValue)
+        {
+            await Clients.Group(message.GroupChatId.Value.ToString()).SendAsync("MessageEdited", message);
+        }
+        else if (message.PersonalChatId.HasValue)
+        {
+            await Clients.User(message.ReceiverId.ToString()).SendAsync("MessageEdited", message);
+            await Clients.Caller.SendAsync("MessageEdited", message);
+        }
+
+        _broadcastService.NotifyMessageEdited(message);
+    }
+
+    public async Task DeleteMessage(int messageId)
+    {
+        var senderId = GetUserId();
+        if (senderId == 0) return;
+
+        var msg = await _mediator.Send(new GetMessageByIdQuery { MessageId = messageId });
+        if (msg == null) return;
+
+        if (msg.SenderId != senderId) return;
+
+        var success = await _mediator.Send(new DeleteMessageCommand
+        {
+            MessageId = messageId,
+            SenderId = senderId,
+        });
+
+        if (!success) return;
+
+        if (msg.GroupChatId.HasValue)
+        {
+            await Clients.Group(msg.GroupChatId.Value.ToString()).SendAsync("MessageDeleted", messageId, msg.GroupChatId);
+        }
+        else if (msg.PersonalChatId.HasValue)
+        {
+            await Clients.User(msg.ReceiverId.ToString()).SendAsync("MessageDeleted", messageId, msg.PersonalChatId);
+            await Clients.Caller.SendAsync("MessageDeleted", messageId, msg.PersonalChatId);
+        }
+
+        _broadcastService.NotifyMessageDeleted(messageId, msg.GroupChatId, msg.PersonalChatId);
     }
 
     // ─── Message Status ───────────────────────────────────────

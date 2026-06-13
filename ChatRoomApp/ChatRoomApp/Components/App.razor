@@ -17,6 +17,11 @@
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.addEventListener('pagehide', function () {
+            navigator.sendBeacon('/api/users/offline', '');
+        });
+    </script>
 </body>
 
 </html>

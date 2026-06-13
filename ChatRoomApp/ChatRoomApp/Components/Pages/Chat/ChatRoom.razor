@@ -5,10 +5,12 @@
 @using Application.PersonalChats.UseCases.Commands
 @using Application.GroupChats.UseCases.Queries
 @using Application.GroupChats.UseCases.Commands
+@using Application.Messages.UseCases.Commands
 @using Application.Messages.UseCases.Dto
 @using Application.Users.UseCases.Queries
 @using Application.Users.UseCases.DTOs
 @using ChatRoomApp.Services
+@using Domain.Entities
 @using MediatR
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
@@ -34,9 +36,32 @@
         </div>
         @if (isGroupChat)
         {
-            <button class="btn btn-sm btn-outline-light" @onclick="ShowAddMemberModal" title="Add Member">
-                <i class="fas fa-user-plus"></i>
-            </button>
+            @if (currentUserRole is GroupRole.Owner or GroupRole.Admin)
+            {
+                <button class="btn btn-sm btn-outline-light" @onclick="ShowAddMemberModal" title="Add Member">
+                    <i class="fas fa-user-plus"></i>
+                </button>
+            }
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-light" @onclick="ToggleSettingsMenu" type="button">
+                    <i class="fas fa-cog"></i>
+                </button>
+                @if (showSettingsMenu)
+                {
+                    <div class="dropdown-backdrop" @onclick="CloseSettingsMenu"></div>
+                    <div class="settings-menu">
+                        @if (currentUserRole is GroupRole.Owner or GroupRole.Admin)
+                        {
+                            <button class="settings-item" @onclick="ShowEditGroupNameModal"><i class="fas fa-pen me-2"></i>Edit Group Name</button>
+                        }
+                        @if (currentUserRole is GroupRole.Owner)
+                        {
+                            <button class="settings-item text-danger" @onclick="ShowDeleteGroupConfirm"><i class="fas fa-trash me-2"></i>Delete Group</button>
+                        }
+                        <button class="settings-item text-warning" @onclick="ShowLeaveGroupConfirm"><i class="fas fa-sign-out-alt me-2"></i>Leave Group</button>
+                    </div>
+                }
+            </div>
         }
     </div>
 
@@ -71,10 +96,32 @@
                         {
                             <div class="reply-preview">Replying to a message</div>
                         }
-                        <div class="msg-text">@msg.Text</div>
+                        @if (msg.IsDeleted)
+                        {
+                            <div class="msg-text deleted-msg"><em>This message was deleted</em></div>
+                        }
+                        else
+                        {
+                            @if (editingMessageId == msg.Id)
+                            {
+                                <textarea class="form-control edit-msg-input" @bind="editingMessageText" @bind:event="oninput"></textarea>
+                                <div class="edit-actions mt-1">
+                                    <button class="btn btn-sm btn-success me-1" @onclick="() => SaveEdit(msg.Id)"><i class="fas fa-check"></i></button>
+                                    <button class="btn btn-sm btn-secondary" @onclick="CancelEdit"><i class="fas fa-times"></i></button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="msg-text">@msg.Text</div>
+                            }
+                        }
                         <div class="msg-meta d-flex align-items-center justify-content-end gap-1">
+                            @if (msg.IsEdited && !msg.IsDeleted)
+                            {
+                                <span class="edited-badge">(edited)</span>
+                            }
                             <span class="msg-time">@msg.SentTime.ToShortTimeString()</span>
-                            @if (isMine)
+                            @if (isMine && !msg.IsDeleted)
                             {
                                 @if (msg.IsSeen)
                                 {
@@ -89,6 +136,21 @@
                                     <i class="fas fa-check text-secondary" style="font-size:0.65rem"></i>
                                 }
                             }
+                            @if (isMine && !msg.IsDeleted && editingMessageId != msg.Id)
+                            {
+                                <div class="msg-dropdown" @onclick="() => ToggleMessageMenu(msg.Id)" tabindex="0">
+                                    <button class="btn btn-sm btn-link text-white p-0 ms-1" type="button" style="font-size:0.65rem;line-height:1;text-decoration:none;opacity:0.6">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    @if (showMessageMenuForId == msg.Id)
+                                    {
+                                        <div class="msg-menu">
+                                            <button class="msg-menu-item" @onclick="() => StartEdit(msg.Id, msg.Text)" @onclick:stopPropagation="true"><i class="fas fa-pen me-2"></i>Edit</button>
+                                            <button class="msg-menu-item text-danger" @onclick="() => ConfirmDelete(msg.Id)" @onclick:stopPropagation="true"><i class="fas fa-trash me-2"></i>Delete</button>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -101,6 +163,7 @@
                   rows="1"
                   placeholder="Type a message..."
                   @bind="messageText"
+                  @bind:event="oninput"
                   @onkeydown="HandleKeyDown"
                   disabled="@isLoading" />
         <button class="btn btn-primary send-btn"
@@ -188,6 +251,100 @@
     </div>
 }
 
+@if (showEditGroupNameModal)
+{
+    <div class="grp-modal-overlay" @onclick="CloseEditGroupNameModal">
+        <div class="grp-modal-box" @onclick:stopPropagation="true">
+            <div class="grp-modal-head">
+                <h5 class="grp-modal-title"><i class="fas fa-pen me-2"></i>Edit Group Name</h5>
+                <button type="button" class="btn-close" @onclick="CloseEditGroupNameModal">×</button>
+            </div>
+            <div class="grp-modal-body">
+                <div class="mb-3">
+                    <label for="groupNameInput" class="form-label">Group Name</label>
+                    <input id="groupNameInput" type="text" class="form-control" @bind="editGroupNameText" />
+                </div>
+                @if (!string.IsNullOrEmpty(editGroupNameError))
+                {
+                    <div class="alert alert-danger py-2">@editGroupNameError</div>
+                }
+            </div>
+            <div class="grp-modal-foot">
+                <button type="button" class="btn btn-secondary me-2" @onclick="CloseEditGroupNameModal">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="SaveGroupName" disabled="@(string.IsNullOrWhiteSpace(editGroupNameText) || isSavingGroupName)">
+                    @if (isSavingGroupName)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-save me-1"></i>
+                    }
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showLeaveGroupConfirm)
+{
+    <div class="grp-modal-overlay" @onclick="CloseLeaveGroupConfirm">
+        <div class="grp-modal-box" @onclick:stopPropagation="true">
+            <div class="grp-modal-head">
+                <h5 class="grp-modal-title text-warning"><i class="fas fa-sign-out-alt me-2"></i>Leave Group</h5>
+                <button type="button" class="btn-close" @onclick="CloseLeaveGroupConfirm">×</button>
+            </div>
+            <div class="grp-modal-body">
+                <p>Are you sure you want to leave <strong>@chatName</strong>?</p>
+                @if (!string.IsNullOrEmpty(leaveGroupError))
+                {
+                    <div class="alert alert-danger py-2">@leaveGroupError</div>
+                }
+            </div>
+            <div class="grp-modal-foot">
+                <button type="button" class="btn btn-secondary me-2" @onclick="CloseLeaveGroupConfirm">Cancel</button>
+                <button type="button" class="btn btn-warning" @onclick="LeaveGroup" disabled="@isLeavingGroup">
+                    @if (isLeavingGroup)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    Leave
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteGroupConfirm)
+{
+    <div class="grp-modal-overlay" @onclick="CloseDeleteGroupConfirm">
+        <div class="grp-modal-box" @onclick:stopPropagation="true">
+            <div class="grp-modal-head">
+                <h5 class="grp-modal-title text-danger"><i class="fas fa-trash me-2"></i>Delete Group</h5>
+                <button type="button" class="btn-close" @onclick="CloseDeleteGroupConfirm">×</button>
+            </div>
+            <div class="grp-modal-body">
+                <p>Are you sure you want to delete <strong>@chatName</strong>? This action cannot be undone.</p>
+                @if (!string.IsNullOrEmpty(deleteGroupError))
+                {
+                    <div class="alert alert-danger py-2">@deleteGroupError</div>
+                }
+            </div>
+            <div class="grp-modal-foot">
+                <button type="button" class="btn btn-secondary me-2" @onclick="CloseDeleteGroupConfirm">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick="DeleteGroup" disabled="@isDeletingGroup">
+                    @if (isDeletingGroup)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter] public int ChatId { get; set; }
 
@@ -201,6 +358,7 @@
     private int currentUserId;
     private int otherUserId;
     private Dictionary<int, string> senderNames = new();
+    private GroupRole? currentUserRole;
     private ElementReference messagesContainer;
 
     private bool showAddMemberModal;
@@ -211,6 +369,24 @@
     private UserDto? foundMember;
     private bool isAddingMember;
     private MemberAddedMessage? memberAddedMessage;
+
+    private bool showEditGroupNameModal;
+    private string editGroupNameText = string.Empty;
+    private string editGroupNameError = string.Empty;
+    private bool isSavingGroupName;
+
+    private bool showLeaveGroupConfirm;
+    private string leaveGroupError = string.Empty;
+    private bool isLeavingGroup;
+
+    private bool showDeleteGroupConfirm;
+    private string deleteGroupError = string.Empty;
+    private bool isDeletingGroup;
+
+    private int? editingMessageId;
+    private string editingMessageText = string.Empty;
+    private bool showSettingsMenu;
+    private int? showMessageMenuForId;
 
     private class MemberAddedMessage
     {
@@ -228,6 +404,8 @@
 
         BroadcastService.OnPersonalMessageReceived += HandlePersonalMessage;
         BroadcastService.OnGroupMessageReceived += HandleGroupMessage;
+        BroadcastService.OnMessageEdited += HandleMessageEdited;
+        BroadcastService.OnMessageDeleted += HandleMessageDeleted;
         StatusBroadcast.OnUserStatusChanged += HandleUserStatusChanged;
 
         await LoadChat();
@@ -264,6 +442,12 @@
                 chatName = group.Name;
                 statusText = $"{group.Members.Count} members";
                 messages = group.Messages.OrderBy(m => m.SentTime).ToList();
+
+                foreach (var member in group.Members)
+                {
+                    if (member.UserId == currentUserId)
+                        currentUserRole = member.Role;
+                }
 
                 foreach (var member in group.Members)
                 {
@@ -401,9 +585,283 @@
         catch { }
     }
 
+    private void HandleMessageEdited(MessageDto msg)
+    {
+        var idx = messages.FindIndex(m => m.Id == msg.Id);
+        if (idx >= 0)
+        {
+            messages[idx] = msg;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleMessageDeleted(int messageId, int? groupChatId, int? personalChatId)
+    {
+        if (isGroupChat && groupChatId == ChatId)
+        {
+            var idx = messages.FindIndex(m => m.Id == messageId);
+            if (idx >= 0)
+            {
+                messages[idx].IsDeleted = true;
+                messages[idx].Text = "This message was deleted";
+                InvokeAsync(StateHasChanged);
+            }
+        }
+        else if (!isGroupChat && personalChatId == ChatId)
+        {
+            var idx = messages.FindIndex(m => m.Id == messageId);
+            if (idx >= 0)
+            {
+                messages[idx].IsDeleted = true;
+                messages[idx].Text = "This message was deleted";
+                InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    // ─── Message Edit / Delete ────────────────────────────────
+    private void StartEdit(int messageId, string text)
+    {
+        showMessageMenuForId = null;
+        editingMessageId = messageId;
+        editingMessageText = text;
+    }
+
+    private void CancelEdit()
+    {
+        editingMessageId = null;
+        editingMessageText = string.Empty;
+    }
+
+    private async Task SaveEdit(int messageId)
+    {
+        if (string.IsNullOrWhiteSpace(editingMessageText)) return;
+
+        var msg = await Mediator.Send(new UpdateMessageCommand
+        {
+            MessageId = messageId,
+            Text = editingMessageText,
+            SenderId = currentUserId,
+        });
+
+        if (msg != null)
+        {
+            var idx = messages.FindIndex(m => m.Id == messageId);
+            if (idx >= 0)
+                messages[idx] = msg;
+
+            if (msg.GroupChatId.HasValue)
+            {
+                await HubContext.Clients.Group(msg.GroupChatId.Value.ToString())
+                    .SendAsync("MessageEdited", msg);
+            }
+            BroadcastService.NotifyMessageEdited(msg);
+        }
+
+        CancelEdit();
+    }
+
+    private async Task ConfirmDelete(int messageId)
+    {
+        var msg = messages.FirstOrDefault(m => m.Id == messageId);
+        if (msg == null) return;
+
+        var success = await Mediator.Send(new DeleteMessageCommand
+        {
+            MessageId = messageId,
+            SenderId = currentUserId,
+        });
+
+        if (success)
+        {
+            msg.IsDeleted = true;
+            msg.Text = "This message was deleted";
+
+            if (msg.GroupChatId.HasValue)
+            {
+                await HubContext.Clients.Group(msg.GroupChatId.Value.ToString())
+                    .SendAsync("MessageDeleted", messageId, msg.GroupChatId);
+            }
+            BroadcastService.NotifyMessageDeleted(messageId, msg.GroupChatId, msg.PersonalChatId);
+            StateHasChanged();
+        }
+    }
+
+    // ─── Edit Group Name ──────────────────────────────────────
+    private void ShowEditGroupNameModal()
+    {
+        showSettingsMenu = false;
+        editGroupNameText = chatName;
+        editGroupNameError = string.Empty;
+        isSavingGroupName = false;
+        showEditGroupNameModal = true;
+    }
+
+    private void CloseEditGroupNameModal()
+    {
+        showEditGroupNameModal = false;
+    }
+
+    private async Task SaveGroupName()
+    {
+        if (string.IsNullOrWhiteSpace(editGroupNameText) || isSavingGroupName) return;
+        isSavingGroupName = true;
+        editGroupNameError = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var success = await Mediator.Send(new UpdateGroupChatCommand
+            {
+                GroupId = ChatId,
+                Name = editGroupNameText,
+                RequestedByUserId = currentUserId,
+            });
+
+            if (success)
+            {
+                chatName = editGroupNameText;
+                showEditGroupNameModal = false;
+            }
+            else
+            {
+                editGroupNameError = "You don't have permission to edit the group name.";
+            }
+        }
+        catch (Exception ex)
+        {
+            editGroupNameError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSavingGroupName = false;
+            StateHasChanged();
+        }
+    }
+
+    // ─── Leave Group ──────────────────────────────────────────
+    private void ShowLeaveGroupConfirm()
+    {
+        showSettingsMenu = false;
+        leaveGroupError = string.Empty;
+        isLeavingGroup = false;
+        showLeaveGroupConfirm = true;
+    }
+
+    private void CloseLeaveGroupConfirm()
+    {
+        showLeaveGroupConfirm = false;
+    }
+
+    private async Task LeaveGroup()
+    {
+        if (isLeavingGroup) return;
+        isLeavingGroup = true;
+        leaveGroupError = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var success = await Mediator.Send(new LeaveGroupCommand
+            {
+                GroupId = ChatId,
+                UserId = currentUserId,
+            });
+
+            if (success)
+            {
+                await HubContext.Clients.Group(ChatId.ToString())
+                    .SendAsync("UserLeftGroup", currentUserId, ChatId);
+                Navigation.NavigateTo("/chat/group");
+            }
+            else
+            {
+                leaveGroupError = "Failed to leave the group.";
+            }
+        }
+        catch (Exception ex)
+        {
+            leaveGroupError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLeavingGroup = false;
+            StateHasChanged();
+        }
+    }
+
+    // ─── Delete Group ─────────────────────────────────────────
+    private void ShowDeleteGroupConfirm()
+    {
+        showSettingsMenu = false;
+        deleteGroupError = string.Empty;
+        isDeletingGroup = false;
+        showDeleteGroupConfirm = true;
+    }
+
+    private void CloseDeleteGroupConfirm()
+    {
+        showDeleteGroupConfirm = false;
+    }
+
+    private async Task DeleteGroup()
+    {
+        if (isDeletingGroup) return;
+        isDeletingGroup = true;
+        deleteGroupError = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var success = await Mediator.Send(new DeleteGroupChatCommand
+            {
+                GroupId = ChatId,
+                RequestedByUserId = currentUserId,
+            });
+
+            if (success)
+            {
+                Navigation.NavigateTo("/chat/group");
+            }
+            else
+            {
+                deleteGroupError = "Only the owner can delete the group.";
+            }
+        }
+        catch (Exception ex)
+        {
+            deleteGroupError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isDeletingGroup = false;
+            StateHasChanged();
+        }
+    }
+
     private string GetSenderName(int userId)
     {
         return senderNames.TryGetValue(userId, out var name) ? name : "Unknown";
+    }
+
+    private void ToggleSettingsMenu()
+    {
+        showSettingsMenu = !showSettingsMenu;
+    }
+
+    private void CloseSettingsMenu()
+    {
+        showSettingsMenu = false;
+    }
+
+    private void ToggleMessageMenu(int messageId)
+    {
+        showMessageMenuForId = showMessageMenuForId == messageId ? null : messageId;
+    }
+
+    private void CloseMessageMenu()
+    {
+        showMessageMenuForId = null;
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -492,6 +950,7 @@
             {
                 GroupId = ChatId,
                 UserId = userId,
+                RequestedByUserId = currentUserId,
             });
 
             if (success)
@@ -509,7 +968,7 @@
             {
                 memberAddedMessage = new MemberAddedMessage
                 {
-                    Text = "User is already a member or not found.",
+                    Text = "You don't have permission or user is already a member.",
                     IsSuccess = false,
                 };
             }
@@ -532,6 +991,8 @@
     {
         BroadcastService.OnPersonalMessageReceived -= HandlePersonalMessage;
         BroadcastService.OnGroupMessageReceived -= HandleGroupMessage;
+        BroadcastService.OnMessageEdited -= HandleMessageEdited;
+        BroadcastService.OnMessageDeleted -= HandleMessageDeleted;
         StatusBroadcast.OnUserStatusChanged -= HandleUserStatusChanged;
     }
 }
@@ -758,6 +1219,131 @@
 
     .user-info strong {
         display: block;
+    }
+
+    .edited-badge {
+        font-size: 0.6rem;
+        font-style: italic;
+        opacity: 0.6;
+        margin-right: 4px;
+    }
+
+    .deleted-msg em {
+        font-style: italic;
+        opacity: 0.5;
+        font-size: 0.85rem;
+    }
+
+    .edit-msg-input {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+        resize: vertical;
+    }
+
+    .edit-msg-input:focus {
+        border-color: #0d6efd;
+        box-shadow: none;
+    }
+
+    .edit-actions .btn {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+        line-height: 1.3;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99;
+    }
+
+    .settings-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 180px;
+        background: #1e1e2f;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        z-index: 101;
+        padding: 0.25rem 0;
+        margin-top: 4px;
+    }
+
+    .settings-item {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        background: none;
+        border: none;
+        color: #e0e0e0;
+        text-align: left;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .settings-item:hover {
+        background: rgba(255,255,255,0.06);
+    }
+
+    .settings-item i {
+        width: 16px;
+    }
+
+    .msg-dropdown {
+        position: relative;
+        display: inline-block;
+        outline: none;
+    }
+
+    .msg-menu {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        min-width: 110px;
+        background: #1e1e2f;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        z-index: 100;
+        padding: 0.2rem 0;
+        margin-bottom: 4px;
+    }
+
+    .msg-menu-item {
+        display: block;
+        width: 100%;
+        padding: 0.35rem 0.75rem;
+        background: none;
+        border: none;
+        color: #e0e0e0;
+        text-align: left;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .msg-menu-item:hover {
+        background: rgba(255,255,255,0.06);
+    }
+
+    .msg-menu-item i {
+        width: 14px;
+        font-size: 0.7rem;
     }
 
     @@media (max-width: 768px) {

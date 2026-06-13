@@ -1,3 +1,4 @@
+using Application.Messages.UseCases.Commands;
 using Application.Messages.UseCases.Queries;
 using MediatR;
 
@@ -10,6 +11,8 @@ public static class MessagesEndpoints
         var group = app.MapGroup("/api/messages").WithTags("Messages").RequireAuthorization();
 
         group.MapGet("/", GetMessagesAsync);
+        group.MapPut("/{messageId:int}", EditMessageAsync);
+        group.MapDelete("/{messageId:int}", DeleteMessageAsync);
 
         return group;
     }
@@ -28,4 +31,27 @@ public static class MessagesEndpoints
         }
         return Results.BadRequest("Provide personalChatId or groupChatId");
     }
+
+    private static async Task<IResult> EditMessageAsync(int messageId, EditMessageRequest request, IMediator mediator)
+    {
+        var msg = await mediator.Send(new UpdateMessageCommand
+        {
+            MessageId = messageId,
+            Text = request.Text,
+            SenderId = request.SenderId,
+        });
+        return msg is null ? Results.Forbid() : Results.Ok(msg);
+    }
+
+    private static async Task<IResult> DeleteMessageAsync(int messageId, int senderId, IMediator mediator)
+    {
+        var success = await mediator.Send(new DeleteMessageCommand
+        {
+            MessageId = messageId,
+            SenderId = senderId,
+        });
+        return success ? Results.Ok() : Results.Forbid();
+    }
+
+    private record EditMessageRequest(string Text, int SenderId);
 }

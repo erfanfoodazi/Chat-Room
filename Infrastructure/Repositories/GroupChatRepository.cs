@@ -21,6 +21,38 @@ namespace Infrastructure.Repositories
             _context = context;
             _logger = logger;
         }
+        public async Task<bool> RemoveUserFromGroup(int groupId, int userId)
+        {
+            var group = await _context.GroupChats
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == groupId);
+
+            if (group == null)
+            {
+                _logger.LogError("Group chat not found {groupId}", groupId);
+                return false;
+            }
+
+            var member = group.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member == null)
+            {
+                _logger.LogWarning("User {userId} is not a member of group {groupId}", userId, groupId);
+                return false;
+            }
+
+            group.Members.Remove(member);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<GroupRole?> GetGroupMemberRole(int groupId, int userId)
+        {
+            var member = await _context.GroupMembers
+                .FirstOrDefaultAsync(m => m.GroupChatId == groupId && m.UserId == userId);
+
+            return member?.Role;
+        }
+
         public async Task<bool> AddUserToGroupId(int groupId, User user)
         {
              var groupChat = await _context.GroupChats
@@ -94,7 +126,9 @@ namespace Infrastructure.Repositories
 
         public async Task<GroupChat> GetGroupChatByGroupId(int groupId)
         {
-            var group = await _context.GroupChats.FindAsync(groupId);
+            var group = await _context.GroupChats
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == groupId);
             if (group == null)
             {
                 _logger.LogWarning("Group Chat not found {GroupId}",groupId);

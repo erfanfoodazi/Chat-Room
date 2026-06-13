@@ -11,6 +11,7 @@ namespace Application.Messages.UseCases.Commands
     public class DeleteMessageCommand : IRequest<bool>
     {
         public int MessageId { get; set; }
+        public int SenderId { get; set; }
     }
 
     public class DeleteMessageCommandHandler : IRequestHandler<DeleteMessageCommand, bool>
@@ -22,6 +23,13 @@ namespace Application.Messages.UseCases.Commands
         }
         public async Task<bool> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)
         {
+            var message = await _messageRepository.GetMessageByIdAsync(request.MessageId);
+            if (message == null)
+                return false;
+
+            if (message.SenderId != request.SenderId)
+                return false;
+
             return await _messageRepository.DeleteMessageAsync(request.MessageId);
         }
     }

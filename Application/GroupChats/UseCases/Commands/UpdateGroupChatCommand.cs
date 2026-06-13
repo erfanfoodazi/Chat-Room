@@ -15,7 +15,7 @@ namespace Application.GroupChats.UseCases.Commands
         public string Description { get; set; } = string.Empty;
         public string ProfilePictureUrl { get; set; } = string.Empty;
         public bool IsPublic { get; set; }
-        public int OwnerId { get; set; }
+        public int RequestedByUserId { get; set; }
     }
 
     public class UpdateGroupChatCommandHandler : IRequestHandler<UpdateGroupChatCommand, bool>
@@ -27,15 +27,19 @@ namespace Application.GroupChats.UseCases.Commands
         }
         public async Task<bool> Handle(UpdateGroupChatCommand request, CancellationToken cancellationToken)
         {
+            var role = await _groupChatRepository.GetGroupMemberRole(request.GroupId, request.RequestedByUserId);
+            if (role != GroupRole.Owner && role != GroupRole.Admin)
+                return false;
+
             var group = await _groupChatRepository.GetGroupChatByGroupId(request.GroupId);
             if (group == null)
                 return false;
 
             group.Name = request.Name;
-            group.Description = request.Description;
-            group.ProfilePictureUrl = request.ProfilePictureUrl;
-            group.IsPublic = request.IsPublic;
-            group.OwnerId = request.OwnerId;
+            if (request.Description != string.Empty)
+                group.Description = request.Description;
+            if (request.ProfilePictureUrl != string.Empty)
+                group.ProfilePictureUrl = request.ProfilePictureUrl;
 
             return await _groupChatRepository.UpdateGroupChat(group);
         }
