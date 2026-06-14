@@ -120,7 +120,7 @@
                             {
                                 <span class="edited-badge">(edited)</span>
                             }
-                            <span class="msg-time">@msg.SentTime.ToShortTimeString()</span>
+                            <span class="msg-time">@msg.SentTime.ToLocalTime().ToShortTimeString()</span>
                             @if (isMine && !msg.IsDeleted)
                             {
                                 @if (msg.IsSeen)

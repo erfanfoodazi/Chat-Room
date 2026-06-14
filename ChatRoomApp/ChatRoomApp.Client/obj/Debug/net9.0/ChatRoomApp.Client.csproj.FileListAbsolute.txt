@@ -1,9 +1,5 @@
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\blazor.boot.json
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\blazor.webassembly.js
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.co7x37as5u.pdb
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.7ct3duzp31.wasm
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.vyuzvatrb0.pdb
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.9i1jcxtt8r.wasm
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\dotnet.js
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\dotnet.js.map
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\dotnet.native.xto5am0qhx.js
@@ -315,7 +311,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwro
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Reflection.ggt0f3b7q1.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.StackTrace.n5pk0s08oq.wasm.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.co7x37as5u.pdb.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\Microsoft.Extensions.Configuration.ic45gpxjv4.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Data.Common.wqa2m2dm1e.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Private.DataContractSerialization.8bga7lg7ks.wasm.gz
@@ -340,7 +335,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwro
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.InteropServices.RuntimeInformation.dsan99kxm0.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Linq.Queryable.wua0cwigh0.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Collections.NonGeneric.wzm9kz4nov.wasm.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.7ct3duzp31.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.FileVersionInfo.7w3k9pq4ym.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\Microsoft.AspNetCore.Components.WebAssembly.5cygu8f0zf.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Security.SecureString.x5usizn7ip.wasm.gz
@@ -414,7 +408,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwro
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.Debug.ivldo6uw9j.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\mscorlib.sx4ehutq6w.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.Numerics.4mhdypi4ng.wasm.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.9i1jcxtt8r.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Reflection.TypeExtensions.eem5k57xno.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Xml.yjr7wyyuz2.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Linq.hy62v1234y.wasm.gz
@@ -430,7 +423,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwro
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\Microsoft.AspNetCore.Components.flveird317.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Reflection.Emit.ILGeneration.avoed2u9uf.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Security.Cryptography.OpenSsl.sk0dyagx31.wasm.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.vyuzvatrb0.pdb.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\System.Threading.Thread.skthqmlj72.wasm.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\ChatRoomApp.Client.staticwebassets.runtime.json
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\ChatRoomApp.Client.staticwebassets.endpoints.json
@@ -1082,11 +1074,6 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compr
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\h6sohl4qxg-tjcz0u77k5.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\3lpa5rsoga-tptq2av103.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\nvxyb7mpwf-lfu7j35m59.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\wtahgf1thk-9i1jcxtt8r.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\zgznayh6kb-vyuzvatrb0.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\lpgx4fwjt7-7ct3duzp31.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\hmsu476xsw-co7x37as5u.gz
-D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\7bxsskwvpk-f6adecabti.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.development.json
@@ -1096,4 +1083,17 @@ D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\ChatR
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\refint\ChatRoomApp.Client.dll
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\ChatRoomApp.Client.pdb
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\ref\ChatRoomApp.Client.dll
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.jybg94vniw.pdb
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.oaq4oauo62.wasm
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.nmmo648qon.pdb
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.58ush2v9t9.wasm
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.jybg94vniw.pdb.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Client.oaq4oauo62.wasm.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.58ush2v9t9.wasm.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\bin\Debug\net9.0\wwwroot\_framework\ChatRoomApp.Shared.nmmo648qon.pdb.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\wtahgf1thk-58ush2v9t9.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\zgznayh6kb-nmmo648qon.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\lpgx4fwjt7-oaq4oauo62.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\hmsu476xsw-jybg94vniw.gz
+D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\compressed\7bxsskwvpk-jt88te5z4l.gz
 D:\code\NewJob\Cs\ChatRoom\ChatRoomApp\ChatRoomApp.Client\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

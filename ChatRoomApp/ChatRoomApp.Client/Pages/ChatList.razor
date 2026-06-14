@@ -204,7 +204,7 @@
 
     private static string FormatTime(DateTime time)
     {
-        var diff = DateTime.Now - time;
+        var diff = DateTime.UtcNow - time;
         if (diff.TotalMinutes < 1) return "now";
         if (diff.TotalHours < 1) return $"{(int)diff.TotalMinutes}m";
         if (diff.TotalDays < 1) return $"{(int)diff.TotalHours}h";

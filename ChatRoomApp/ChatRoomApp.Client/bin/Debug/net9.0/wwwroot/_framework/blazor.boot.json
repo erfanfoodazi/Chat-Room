@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "ChatRoomApp.Client",
   "resources": {
-    "hash": "sha256-Hnsqnm3T6/d4OGQBDAqSG3RGMMDVLZZo25v8wG/D/8s=",
+    "hash": "sha256-P0byFNs1Vz3xVbHE8wLCekeOjlanF8uSR4nFUf9k9/M=",
     "fingerprinting": {
       "Microsoft.AspNetCore.Authorization.qe23mgxr71.wasm": "Microsoft.AspNetCore.Authorization.wasm",
       "Microsoft.AspNetCore.Components.flveird317.wasm": "Microsoft.AspNetCore.Components.wasm",
@@ -212,10 +212,10 @@
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
       "icudt_EFIGS.tptq2av103.dat": "icudt_EFIGS.dat",
       "icudt_no_CJK.lfu7j35m59.dat": "icudt_no_CJK.dat",
-      "ChatRoomApp.Shared.9i1jcxtt8r.wasm": "ChatRoomApp.Shared.wasm",
-      "ChatRoomApp.Shared.vyuzvatrb0.pdb": "ChatRoomApp.Shared.pdb",
-      "ChatRoomApp.Client.7ct3duzp31.wasm": "ChatRoomApp.Client.wasm",
-      "ChatRoomApp.Client.co7x37as5u.pdb": "ChatRoomApp.Client.pdb"
+      "ChatRoomApp.Shared.58ush2v9t9.wasm": "ChatRoomApp.Shared.wasm",
+      "ChatRoomApp.Shared.nmmo648qon.pdb": "ChatRoomApp.Shared.pdb",
+      "ChatRoomApp.Client.oaq4oauo62.wasm": "ChatRoomApp.Client.wasm",
+      "ChatRoomApp.Client.jybg94vniw.pdb": "ChatRoomApp.Client.pdb"
     },
     "jsModuleNative": {
       "dotnet.native.xto5am0qhx.js": "sha256-9e5Vqt0u8nYMGCHU4JfYqrYQExAw3bgi5UYzATgvoJE="
@@ -436,12 +436,12 @@
       "WindowsBase.5f1yvnaer4.wasm": "sha256-sZbAt8RTAmg0USTJj6J32jxvlakGs2AutNm/Bbr5Sc8=",
       "mscorlib.sx4ehutq6w.wasm": "sha256-gLaFs2FD2zCxDmOFrpTh9Y37En7r1yCv1BpjcPkFpgA=",
       "netstandard.ck9kwje9e5.wasm": "sha256-bNmBHwwBfUwMiL+sza9G3xQiNjeEtZksW9XVhj3ravI=",
-      "ChatRoomApp.Shared.9i1jcxtt8r.wasm": "sha256-n7GZmYgENrG/QTb3QwBcKqT1kdRK7Mec1geh5Vv9ods=",
-      "ChatRoomApp.Client.7ct3duzp31.wasm": "sha256-uXOmTKHw2+fdaqu+pnLTSg4uSH5i4zphvZkXehLMukA="
+      "ChatRoomApp.Shared.58ush2v9t9.wasm": "sha256-BbGBCAUkgGodLpf6Bv+OZG4iH3VeUF3Y2F/iiwFMPZI=",
+      "ChatRoomApp.Client.oaq4oauo62.wasm": "sha256-4EETlAKIXxyReuDNVXTrKTm5uIPR83g2JXzLAgz73dw="
     },
     "pdb": {
-      "ChatRoomApp.Shared.vyuzvatrb0.pdb": "sha256-eQGxPqc/Xmvhh6kmg0GKMLrvRmoa2zRuUy2N3rrbbYY=",
-      "ChatRoomApp.Client.co7x37as5u.pdb": "sha256-HKTRc0PomtcWmI/cg/GSaFlX3LzyQqpSgom25q9qG34="
+      "ChatRoomApp.Shared.nmmo648qon.pdb": "sha256-j97UIJlZ0XNIdH0Th3b9C1qwoSJpPEC/slpMFU6N7q8=",
+      "ChatRoomApp.Client.jybg94vniw.pdb": "sha256-dXaWrbeLc43QPi8HPOI/3hvJhlIS8W/N0X4vtd3nUeY="
     }
   },
   "cacheBootResources": true,

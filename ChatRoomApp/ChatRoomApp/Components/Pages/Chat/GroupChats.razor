@@ -213,7 +213,7 @@ else
 
     private string FormatTime(DateTime time)
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var difference = now - time;
 
         if (difference.TotalMinutes < 1)

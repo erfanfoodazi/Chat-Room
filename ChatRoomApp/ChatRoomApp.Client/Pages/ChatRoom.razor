@@ -51,7 +51,7 @@
                         }
                         <div class="msg-text">@msg.Text</div>
                         <div class="msg-meta">
-                            <span class="msg-time">@msg.SentTime.ToShortTimeString()</span>
+                            <span class="msg-time">@msg.SentTime.ToLocalTime().ToShortTimeString()</span>
                             @if (isMine)
                             {
                                 @if (msg.IsSeen) { <i class="fas fa-check-double text-info ms-1" style="font-size:0.7rem"></i> }
