@@ -30,6 +30,8 @@ namespace Application.Messages.UseCases.Dto
         public int? PersonalChatId { get; set; }
         public int? GroupChatId { get; set; }
         public int? ReplyToMessageId { get; set; }
+        public string? ReplyToMessageText { get; set; }
+        public string? ReplyToSenderName { get; set; }
         public bool IsPersonalMessage => PersonalChatId.HasValue;
         public bool IsGroupMessage => GroupChatId.HasValue;
 

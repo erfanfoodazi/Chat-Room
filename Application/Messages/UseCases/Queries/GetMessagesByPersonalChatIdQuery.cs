@@ -39,6 +39,24 @@ namespace Application.Messages.UseCases.Queries
                 senderPictures[sid] = u?.ProfilePictureUrl;
             }
 
+            var replyIds = messages.Where(m => m.ReplyToMessageId.HasValue).Select(m => m.ReplyToMessageId!.Value).Distinct().ToList();
+            var replyTexts = new Dictionary<int, string?>();
+            var replySenders = new Dictionary<int, string?>();
+            foreach (var rid in replyIds)
+            {
+                try
+                {
+                    var replyMsg = await _messageRepository.GetMessageByIdAsync(rid);
+                    if (replyMsg != null)
+                    {
+                        replyTexts[rid] = replyMsg.Text;
+                        var replySender = await _userRepository.GetUserByIdAsync(replyMsg.SenderId);
+                        replySenders[rid] = replySender?.FullName ?? replySender?.UserName;
+                    }
+                }
+                catch { }
+            }
+
             return messages.Select(message => new MessageDto()
             {
                 Id = message.Id,
@@ -50,6 +68,8 @@ namespace Application.Messages.UseCases.Queries
                 PersonalChatId = message.PersonalChatId,
                 GroupChatId = message.GroupChatId,
                 ReplyToMessageId = message.ReplyToMessageId,
+                ReplyToMessageText = message.ReplyToMessageId.HasValue ? replyTexts.GetValueOrDefault(message.ReplyToMessageId.Value) : null,
+                ReplyToSenderName = message.ReplyToMessageId.HasValue ? replySenders.GetValueOrDefault(message.ReplyToMessageId.Value) : null,
                 SentTime = message.SentTime,
                 DeliveredTime = message.DeliveredTime,
                 SeenTime = message.SeenTime,

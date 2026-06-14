@@ -59,6 +59,28 @@ namespace Application.Messages.UseCases.Commands
 
             var messageData = await _messageRepository.CreateMessageAsync(message);
 
+            string? replyToText = null;
+            string? replyToSender = null;
+            if (request.ReplyToMessageId.HasValue)
+            {
+                try
+                {
+                    var replyMsg = await _messageRepository.GetMessageByIdAsync(request.ReplyToMessageId.Value);
+                    if (replyMsg != null)
+                    {
+                        replyToText = replyMsg.Text;
+                        if (replyMsg.SenderId == sender.Id)
+                            replyToSender = sender.FullName ?? sender.UserName;
+                        else
+                        {
+                            var replySender = await _userRepository.GetUserByIdAsync(replyMsg.SenderId);
+                            replyToSender = replySender?.FullName ?? replySender?.UserName;
+                        }
+                    }
+                }
+                catch { }
+            }
+
             var result = new MessageDto()
             {
                 Id = messageData.Id,
@@ -69,6 +91,8 @@ namespace Application.Messages.UseCases.Commands
                 PersonalChatId = messageData.PersonalChatId,
                 GroupChatId = messageData.GroupChatId,
                 ReplyToMessageId = messageData.ReplyToMessageId,
+                ReplyToMessageText = replyToText,
+                ReplyToSenderName = replyToSender,
                 Text = messageData.Text,
                 DeletedTime = messageData.DeletedTime,
                 DeliveredTime = messageData.DeliveredTime,
