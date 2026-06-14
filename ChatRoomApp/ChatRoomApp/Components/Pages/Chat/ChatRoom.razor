@@ -87,9 +87,22 @@
             {
                 var isMine = msg.SenderId == currentUserId;
                 <div class="message @(isMine ? "mine" : "theirs")">
-                    @if (!isMine && isGroupChat)
+                    @if (!isMine)
                     {
-                        <small class="sender-name">@msg.SenderName</small>
+                        <div class="sender-row">
+                            @if (!string.IsNullOrEmpty(msg.SenderProfilePictureUrl))
+                            {
+                                <img class="sender-avatar" src="@msg.SenderProfilePictureUrl" alt="" />
+                            }
+                            else
+                            {
+                                <span class="sender-avatar-letter">@(msg.SenderName.Length > 0 ? msg.SenderName[0].ToString().ToUpper() : "?")</span>
+                            }
+                            @if (isGroupChat)
+                            {
+                                <small class="sender-name">@msg.SenderName</small>
+                            }
+                        </div>
                     }
                     <div class="bubble @(isMine ? "bubble-mine" : "bubble-theirs")">
                         @if (msg.ReplyToMessageId.HasValue)
@@ -1058,6 +1071,20 @@
         align-self: flex-start;
     }
 
+    .sender-row {
+        display: flex; align-items: center; gap: 6px;
+        margin-bottom: 2px; padding-left: 4px;
+    }
+    .sender-avatar {
+        width: 24px; height: 24px; border-radius: 50%;
+        object-fit: cover; flex-shrink: 0;
+    }
+    .sender-avatar-letter {
+        width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 0.65rem; font-weight: 700;
+    }
     .sender-name {
         font-size: 0.75rem;
         color: #0d6efd;

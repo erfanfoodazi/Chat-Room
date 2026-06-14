@@ -64,6 +64,7 @@ namespace Application.Messages.UseCases.Commands
                 Id = messageData.Id,
                 SenderId = messageData.SenderId,
                 SenderName = sender.FullName ?? sender.UserName ?? string.Empty,
+                SenderProfilePictureUrl = sender.ProfilePictureUrl,
                 ReceiverId = messageData.ReceiverId,
                 PersonalChatId = messageData.PersonalChatId,
                 GroupChatId = messageData.GroupChatId,

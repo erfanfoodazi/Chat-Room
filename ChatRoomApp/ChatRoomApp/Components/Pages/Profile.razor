@@ -6,9 +6,11 @@
 @using Application.Users.UseCases.Commands
 @using MediatR
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 @inject IMediator Mediator
 @inject NavigationManager Nav
 @inject AuthenticationStateProvider Auth
+@inject IWebHostEnvironment Env
 
 <div class="profile-page">
     <div class="page-header">
@@ -26,7 +28,20 @@
         @if (isEditing)
         {
             <div class="profile-card">
-                <div class="avatar-large">@(editFullName.Length > 0 ? editFullName[0].ToString().ToUpper() : "?")</div>
+                <div class="avatar-edit-wrapper">
+                    @if (!string.IsNullOrEmpty(profilePicturePreview))
+                    {
+                        <img class="avatar-large-img" src="@profilePicturePreview" alt="Profile" />
+                    }
+                    else
+                    {
+                        <div class="avatar-large">@(editFullName.Length > 0 ? editFullName[0].ToString().ToUpper() : "?")</div>
+                    }
+                    <label class="avatar-upload-btn" title="Change profile picture">
+                        <i class="fas fa-camera"></i>
+                        <InputFile OnChange="OnFileSelected" accept=".jpg,.jpeg,.png,.gif,.webp" hidden />
+                    </label>
+                </div>
 
                 @if (!string.IsNullOrEmpty(saveMessage))
                 {
@@ -68,7 +83,14 @@
         else
         {
             <div class="profile-card">
-                <div class="avatar-large">@(user.FullName.Length > 0 ? user.FullName[0].ToString().ToUpper() : "?")</div>
+                @if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+                {
+                    <img class="avatar-large-img" src="@user.ProfilePictureUrl" alt="@user.FullName" />
+                }
+                else
+                {
+                    <div class="avatar-large">@(user.FullName.Length > 0 ? user.FullName[0].ToString().ToUpper() : "?")</div>
+                }
                 <h4 class="mt-3 mb-1">@user.FullName</h4>
                 <p class="text-secondary">@@@user.UserName</p>
 
@@ -107,6 +129,8 @@
     private string editUserName = "";
     private string editEmail = "";
     private string editBio = "";
+    private string? profilePicturePreview;
+    private IBrowserFile? selectedFile;
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,6 +158,37 @@
         }
     }
 
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is null) return;
+
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+        if (!allowed.Contains(ext))
+        {
+            saveMessage = "Only JPG, PNG, GIF, and WebP images are allowed.";
+            saveSuccess = false;
+            return;
+        }
+
+        if (file.Size > 5 * 1024 * 1024)
+        {
+            saveMessage = "Image must be smaller than 5 MB.";
+            saveSuccess = false;
+            return;
+        }
+
+        selectedFile = file;
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        profilePicturePreview = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        saveMessage = null;
+    }
+
     private void StartEditing()
     {
         if (user is null) return;
@@ -141,6 +196,8 @@
         editUserName = user.UserName;
         editEmail = user.Email;
         editBio = user.Bio;
+        profilePicturePreview = user.ProfilePictureUrl;
+        selectedFile = null;
         saveMessage = null;
         isEditing = true;
     }
@@ -148,6 +205,8 @@
     private void CancelEdit()
     {
         isEditing = false;
+        profilePicturePreview = null;
+        selectedFile = null;
         saveMessage = null;
     }
 
@@ -167,6 +226,23 @@
         {
             if (user is null) return;
 
+            var pictureUrl = user.ProfilePictureUrl;
+
+            if (selectedFile is not null)
+            {
+                var uploadsDir = Path.Combine(Env.WebRootPath, "uploads", "profiles");
+                Directory.CreateDirectory(uploadsDir);
+
+                var ext = Path.GetExtension(selectedFile.Name);
+                var fileName = $"user_{user.Id}_{Guid.NewGuid()}{ext}";
+                var filePath = Path.Combine(uploadsDir, fileName);
+
+                await using var fs = new FileStream(filePath, FileMode.Create);
+                await selectedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(fs);
+
+                pictureUrl = $"/uploads/profiles/{fileName}";
+            }
+
             var result = await Mediator.Send(new UpdateUserCommand
             {
                 Id = user.Id,
@@ -174,7 +250,7 @@
                 UserName = editUserName.Trim(),
                 Email = user.Email,
                 Bio = editBio.Trim(),
-                ProfilePictureUrl = user.ProfilePictureUrl,
+                ProfilePictureUrl = pictureUrl,
             });
 
             if (result)
@@ -182,6 +258,8 @@
                 saveMessage = "Profile updated successfully!";
                 saveSuccess = true;
                 isEditing = false;
+                selectedFile = null;
+                profilePicturePreview = null;
                 user = await Mediator.Send(new GetUserByIdQuery { UserId = user.Id });
             }
             else
@@ -213,6 +291,22 @@
         display: flex; align-items: center; justify-content: center;
         color: #fff; font-size: 2.5rem; font-weight: 700;
     }
+    .avatar-large-img {
+        width: 96px; height: 96px; border-radius: 50%; margin: 0 auto;
+        object-fit: cover; display: block;
+    }
+    .avatar-edit-wrapper {
+        position: relative; display: inline-block;
+    }
+    .avatar-upload-btn {
+        position: absolute; bottom: 0; right: 0;
+        width: 32px; height: 32px; border-radius: 50%;
+        background: #0d6efd; border: 2px solid #1e1e2f;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: #fff; font-size: 0.8rem;
+        transition: background 0.2s;
+    }
+    .avatar-upload-btn:hover { background: #0b5ed7; }
     .info-list { margin-top: 2rem; text-align: left; }
     .info-item {
         display: flex; justify-content: space-between; align-items: center;

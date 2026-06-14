@@ -31,10 +31,12 @@ namespace Application.Messages.UseCases.Queries
 
             var senderIds = messages.Select(m => m.SenderId).Distinct().ToList();
             var senderNames = new Dictionary<int, string>();
+            var senderPictures = new Dictionary<int, string?>();
             foreach (var sid in senderIds)
             {
                 var u = await _userRepository.GetUserByIdAsync(sid);
                 senderNames[sid] = u?.FullName ?? u?.UserName ?? string.Empty;
+                senderPictures[sid] = u?.ProfilePictureUrl;
             }
 
             return messages.Select(message => new MessageDto()
@@ -43,6 +45,7 @@ namespace Application.Messages.UseCases.Queries
                 Text = message.Text,
                 SenderId = message.SenderId,
                 SenderName = senderNames.GetValueOrDefault(message.SenderId, string.Empty),
+                SenderProfilePictureUrl = senderPictures.GetValueOrDefault(message.SenderId),
                 ReceiverId = message.ReceiverId,
                 PersonalChatId = message.PersonalChatId,
                 GroupChatId = message.GroupChatId,

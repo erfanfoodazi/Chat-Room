@@ -19,6 +19,7 @@ public class MessageDto
     public int? GroupChatId { get; set; }
     public int? ReplyToMessageId { get; set; }
     public string SenderName { get; set; } = string.Empty;
+    public string? SenderProfilePictureUrl { get; set; }
     public bool IsPersonalMessage => PersonalChatId.HasValue;
     public bool IsGroupMessage => GroupChatId.HasValue;
 }

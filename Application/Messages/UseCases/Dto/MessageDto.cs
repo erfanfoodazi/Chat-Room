@@ -25,6 +25,7 @@ namespace Application.Messages.UseCases.Dto
 
         public int SenderId { get; set; }
         public string SenderName { get; set; } = string.Empty;
+        public string? SenderProfilePictureUrl { get; set; }
         public int? ReceiverId { get; set; }
         public int? PersonalChatId { get; set; }
         public int? GroupChatId { get; set; }
